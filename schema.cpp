@@ -10,7 +10,7 @@
 */
 Schema::Schema(QObject *parent) : QGraphicsScene(parent) {
 	setBackgroundBrush(Qt::white);
-	poseur_de_conducteur = new QGraphicsLineItem(0, 0);
+	poseur_de_conducteur = new QGraphicsLineItem();
 	poseur_de_conducteur -> setZValue(1000000);
 	QPen t;
 	t.setColor(Qt::black);
@@ -23,9 +23,9 @@ Schema::Schema(QObject *parent) : QGraphicsScene(parent) {
 }
 
 /**
-	Dessine l'arriere-plan du schema, cad la grille.
-	@param p Le QPainter a utiliser pour dessiner
-	@param r Le rectangle de la zone a dessiner
+Draw the background of the diagram, ie the grid.
+@param p The QPainter to use for drawing
+@param r The rectangle of the area to be drawn
 */
 void Schema::drawBackground(QPainter *p, const QRectF &r) {
 	p -> save();
@@ -117,7 +117,7 @@ QDomDocument Schema::toXml(bool schema) {
 	QList<Conductor *> liste_conducteurs;
 	
 	
-	// Determine les elements a « XMLiser »
+	// Determine les elements a ? XMLiser ?
 	foreach(QGraphicsItem *qgi, items()) {
 		if (Element *elmt = qgraphicsitem_cast<Element *>(qgi)) {
 			if (schema) liste_elements << elmt;
@@ -149,14 +149,14 @@ QDomDocument Schema::toXml(bool schema) {
 		// enregistrements des bornes de chaque appareil
 		QDomElement bornes = document.createElement("bornes");
 		// pour chaque enfant de l'element
-		foreach(QGraphicsItem *child, elmt -> children()) {
-			// si cet enfant est une borne
+		foreach(QGraphicsItem *child, elmt -> childItems()) {
+			// si cet enfant est une terminal
 			if (Terminal *p = qgraphicsitem_cast<Terminal *>(child)) {
-				// alors on enregistre la borne
-				QDomElement borne = p -> toXml(document);
-				borne.setAttribute("id", id_borne);
+				// alors on enregistre la terminal
+				QDomElement terminal = p -> toXml(document);
+				terminal.setAttribute("id", id_borne);
 				table_adr_id.insert(p, id_borne ++);
-				bornes.appendChild(borne);
+				bornes.appendChild(terminal);
 			}
 		}
 		element.appendChild(bornes);
@@ -173,10 +173,10 @@ QDomDocument Schema::toXml(bool schema) {
 	if (liste_conducteurs.isEmpty()) return(document);
 	QDomElement conducteurs = document.createElement("conducteurs");
 	foreach(Conductor *f, liste_conducteurs) {
-		QDomElement conducteur = document.createElement("conducteur");
-		conducteur.setAttribute("borne1", table_adr_id.value(f -> borne1));
-		conducteur.setAttribute("borne2", table_adr_id.value(f -> borne2));
-		conducteurs.appendChild(conducteur);
+		QDomElement conductor = document.createElement("conductor");
+		conductor.setAttribute("borne1", table_adr_id.value(f -> borne1));
+		conductor.setAttribute("borne2", table_adr_id.value(f -> borne2));
+		conducteurs.appendChild(conductor);
 	}
 	racine.appendChild(conducteurs);
 	
@@ -274,7 +274,7 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 				if (p1 != p2) {
 					bool peut_poser_conducteur = true;
 					bool cia = ((Element *)p2 -> parentItem()) -> connexionsInternesAcceptees();
-					if (!cia) foreach(QGraphicsItem *item, p2 -> parentItem() -> children()) if (item == p1) peut_poser_conducteur = false;
+					if (!cia) foreach(QGraphicsItem *item, p2 -> parentItem() -> childItems()) if (item == p1) peut_poser_conducteur = false;
 					if (peut_poser_conducteur) new Conductor(table_adr_id.value(id_p1), table_adr_id.value(id_p2), 0, this);
 				}
 			} else qDebug() << "Le chargement du conducteur" << id_p1 << id_p2 << "a echoue";
@@ -299,7 +299,8 @@ Element *Schema::elementFromXml(QDomElement &e, QHash<int, Terminal *> &table_id
 		case 1: nvel_elmt = new DEL();        break;
 		case 2: nvel_elmt = new Entree();     break;
 	}*/
-	if (etat != 0) return(false);
+	if (etat != 0) 
+		return(nullptr);
 	bool retour = nvel_elmt -> fromXml(e, table_id_adr);
 	if (!retour) {
 		delete nvel_elmt;
