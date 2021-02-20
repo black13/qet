@@ -1,7 +1,9 @@
 #ifndef QETAPP_H
-	#define QETAPP_H
-	#include <QtGui>
-    #include <qdebug.h>
+#define QETAPP_H
+#include <QtWidgets>
+#include <QMdiArea>
+#include <QPrinter>
+#include <QPrintDialog>
 	class SchemaView;
 	class PanelAppareils;
 	/**
@@ -81,7 +83,7 @@
 		QAction *menu_systray_masquer_restaurer;
 		
 		private:
-		QWorkspace workspace;
+		QMdiArea workspace;
 		SchemaView *schemaInProgress();
 		QSignalMapper windowMapper;
 		/// Dock pour le Panel d'Appareils
