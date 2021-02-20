@@ -8,7 +8,7 @@
 		virtual int nbBornes() const;
 		virtual void paint(QPainter *, const QStyleOptionGraphicsItem *);
 		QString typeId() { return(nomfichier); }
-		QString fichier() { return(nomfichier); }
+		QString file() { return(nomfichier); }
 		bool isNull() { return(elmt_etat != 0); }
 		int etat() { return(elmt_etat); }
 		QString nom() { return(priv_nom); }

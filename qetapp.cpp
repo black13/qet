@@ -1,9 +1,10 @@
 #include "qetapp.h"
-#include "schemavue.h"
+#include "schemaview.h"
 #include "schema.h"
 #include "panelappareils.h"
 #include "aboutqet.h"
-
+#include <QtDebug>
+#include "debug.h"
 /**
 	constructeur
 	@param parent le widget parent de la fenetre principale
@@ -18,28 +19,40 @@ QETApp::QETApp(QWidget *parent) : QMainWindow(parent) {
 	// recupere les arguments passes au programme
 	QStringList args = QCoreApplication::arguments();
 	
-	// recupere les chemins de fichiers parmi les arguments
-	QStringList fichiers;
+	// recupere les chemins de files parmi les arguments
+	QStringList files;
 	for (int i = 1 ; i < args.size() ; ++ i) {
-		if (QFileInfo(args.at(i)).exists()) fichiers << args.at(i);
+		if (QFileInfo(args.at(i)).exists()) files << args.at(i);
 	}
 	
-	// si des chemins de fichiers valides sont passes en arguments
-	QList<SchemaVue *> schema_vues;
-	if (fichiers.size()) {
-		// alors on ouvre ces fichiers
-		foreach(QString fichier, fichiers) {
-			SchemaVue *sv = new SchemaVue(this);
-			if (sv -> ouvrir(fichier)) schema_vues << sv;
+	// si des chemins de files valides sont passes en arguments
+	QList<SchemaView *> schema_vues;
+	if (files.size()) {
+		// alors on ouvre ces files
+		foreach(QString file, files) {
+			SchemaView *sv = new SchemaView(this);
+			if (sv -> open(file)) schema_vues << sv;
 			else delete sv;
 		}
 	}
 	
-	// si aucun schema n'a ete ouvert jusqu'a maintenant, on ouvre un nouveau schema
-	if (!schema_vues.size()) schema_vues << new SchemaVue(this);
+	// if no schema has been opened so far, we open a new schema
+	if (!schema_vues.size()) 
+	{ 
+		auto ret = new SchemaView(this);
+		qDebug() << ret->m_uuid.toString().toUpper().toLatin1().constData();
+		schema_vues << ret;
+		
+	}
 	
-	// ajout de tous les SchemaVue necessaires
-	foreach (SchemaVue *sv, schema_vues) addSchemaVue(sv);
+	
+	// ajout de tous les SchemaView necessaires
+	foreach (SchemaView *sv, schema_vues) 
+	{
+		qDebug() << sv->m_uuid.toString().toUpper().toLatin1().constData();
+		addSchemaVue(sv);
+	}
+	
 	
 	// titre de la fenetre
 	setWindowTitle(tr("QElectroTech"));
@@ -146,14 +159,14 @@ void QETApp::closeEvent(QCloseEvent *) {
 
 /**
 	Gere la sortie de l'application
-	@todo gerer les eventuelles fermetures de fichiers
+	@todo gerer les eventuelles fermetures de files
 */
 void QETApp::quitter() {
-	if (!schemaEnCours()) qApp -> quit();
+	if (!schemaInProgress()) qApp -> quit();
 	else {
 		bool peut_quitter = true;
 		foreach(QWidget *fenetre, workspace.windowList()) {
-			if (qobject_cast<SchemaVue *>(fenetre)) {
+			if (qobject_cast<SchemaView *>(fenetre)) {
 				workspace.setActiveWindow(fenetre);
 				if (!fermer()) {
 					peut_quitter = false;
@@ -177,7 +190,7 @@ void QETApp::toggleFullScreen() {
 	Active ou desactive l'antialiasing sur le rendu graphique du Schema
 */
 void QETApp::toggleAntialiasing() {
-	SchemaVue *sv = schemaEnCours();
+	SchemaView *sv = schemaInProgress();
 	if (!sv) return;
 	sv -> setAntialiasing(!sv -> antialiased());
 	toggle_aa -> setText(sv -> antialiased() ? tr("D\351sactiver l'&antialiasing") : tr("Activer l'&antialiasing"));
@@ -201,14 +214,14 @@ void QETApp::aPropos() {
 void QETApp::actions() {
 	// icones et labels
 	nouveau_fichier   = new QAction(QIcon(":/ico/new.png"),        tr("&Nouveau"),                       this);
-	ouvrir_fichier    = new QAction(QIcon(":/ico/open.png"),       tr("&Ouvrir"),                        this);
+	open_fichier    = new QAction(QIcon(":/ico/open.png"),       tr("&open"),                        this);
 	fermer_fichier    = new QAction(QIcon(":/ico/fileclose.png"),  tr("&Fermer"),                        this);
 	enr_fichier       = new QAction(QIcon(":/ico/save.png"),       tr("&Enregistrer"),                   this);
 	enr_fichier_sous  = new QAction(QIcon(":/ico/saveas.png"),     tr("Enregistrer sous"),               this);
 	importer          = new QAction(QIcon(":/ico/import.png"),     tr("&Importer"),                      this);
 	exporter          = new QAction(QIcon(":/ico/export.png"),     tr("E&xporter"),                      this);
 	imprimer          = new QAction(QIcon(":/ico/print.png"),      tr("Imprimer"),                       this);
-	quitter_qet       = new QAction(QIcon(":/ico/exit.png"),       tr("&Quitter"),                       this);
+	quitter_qet       = new QAction(QIcon(":/ico/exit.png"),       tr("&Exit"),                       this);
 	
 	annuler           = new QAction(QIcon(":/ico/undo.png"),       tr("Annu&ler"),                       this);
 	refaire           = new QAction(QIcon(":/ico/redo.png"),       tr("Re&faire"),                       this);
@@ -252,7 +265,7 @@ void QETApp::actions() {
 	
 	// raccourcis clavier
 	nouveau_fichier   -> setShortcut(QKeySequence::New);
-	ouvrir_fichier    -> setShortcut(QKeySequence::Open);
+	open_fichier    -> setShortcut(QKeySequence::Open);
 	fermer_fichier    -> setShortcut(QKeySequence::Close);
 	enr_fichier       -> setShortcut(QKeySequence::Save);
 	importer          -> setShortcut(QKeySequence(tr("Ctrl+Shift+I")));
@@ -320,11 +333,11 @@ void QETApp::actions() {
 	connect(enr_fichier_sous, SIGNAL(triggered()), this,       SLOT(dialogue_enregistrer_sous()));
 	connect(enr_fichier,      SIGNAL(triggered()), this,       SLOT(enregistrer())              );
 	connect(nouveau_fichier,  SIGNAL(triggered()), this,       SLOT(nouveau())                  );
-	connect(ouvrir_fichier,   SIGNAL(triggered()), this,       SLOT(ouvrir())                   );
+	connect(open_fichier,   SIGNAL(triggered()), this,       SLOT(open())                   );
 	connect(fermer_fichier,   SIGNAL(triggered()), this,       SLOT(fermer())                   );
-	connect(couper,           SIGNAL(triggered()), this,       SLOT(slot_couper())              );
+	connect(couper,           SIGNAL(triggered()), this,       SLOT(slot_cut())              );
 	connect(copier,           SIGNAL(triggered()), this,       SLOT(slot_copier())              );
-	connect(coller,           SIGNAL(triggered()), this,       SLOT(slot_coller())              );
+	connect(coller,           SIGNAL(triggered()), this,       SLOT(slot_paste())              );
 	connect(toggle_aa,        SIGNAL(triggered()), this,       SLOT(toggleAntialiasing())       );
 	connect(f_mosaique,       SIGNAL(triggered()), &workspace, SLOT(tile()));
 	connect(f_cascade,        SIGNAL(triggered()), &workspace, SLOT(cascade()));
@@ -337,12 +350,12 @@ void QETApp::actions() {
 	Mise en place des menus
 */
 void QETApp::menus() {
-	QMenu *menu_fichier   = menuBar() -> addMenu(tr("&Fichier"));
+	QMenu *menu_fichier   = menuBar() -> addMenu(tr("&File"));
 	QMenu *menu_edition   = menuBar() -> addMenu(tr("&\311dition"));
 	QMenu *menu_affichage = menuBar() -> addMenu(tr("Afficha&ge"));
 	QMenu *menu_outils    = menuBar() -> addMenu(tr("O&utils"));
 	QMenu *menu_config    = menuBar() -> addMenu(tr("&Configuration"));
-	menu_fenetres         = menuBar() -> addMenu(tr("Fe&n\352tres"));
+	menu_windows         = menuBar() -> addMenu(tr("Fe&n\352tres"));
 	QMenu *menu_aide      = menuBar() -> addMenu(tr("&Aide"));
 	
 	// tear off feature rulezz... pas ^^ mais bon...
@@ -353,9 +366,9 @@ void QETApp::menus() {
 	menu_config    -> setTearOffEnabled(true);
 	menu_aide      -> setTearOffEnabled(true);
 	
-	// menu Fichier
+	// menu File
 	menu_fichier -> addAction(nouveau_fichier);
-	menu_fichier -> addAction(ouvrir_fichier);
+	menu_fichier -> addAction(open_fichier);
 	menu_fichier -> addAction(enr_fichier);
 	menu_fichier -> addAction(enr_fichier_sous);
 	menu_fichier -> addAction(fermer_fichier);
@@ -382,8 +395,8 @@ void QETApp::menus() {
 	menu_edition -> addAction(supprimer);
 	menu_edition -> addAction(pivoter);
 	
-	// menu Affichage > Afficher
-	QMenu *menu_aff_aff = new QMenu(tr("Afficher"));
+	// menu Affichage > Pinup
+	QMenu *menu_aff_aff = new QMenu(tr("Pinup"));
 	menu_aff_aff -> addAction(barre_outils -> toggleViewAction());
 	menu_aff_aff -> addAction(qdw_pa -> toggleViewAction());
 	
@@ -454,41 +467,42 @@ void QETApp::dialogue_imprimer() {
 void QETApp::dialogue_exporter() {
 	QString nom_fichier = QFileDialog::getSaveFileName(
 		this,
-		tr("Exporter vers le fichier"),
+		tr("Exporter vers le file"),
 		QDir::homePath(),
 		tr("Image PNG (*.png)")
 	);
 	if (nom_fichier != "") {
 		if (!nom_fichier.endsWith(".png", Qt::CaseInsensitive)) nom_fichier += ".png";
-		QFile fichier(nom_fichier);
-		QImage image = schemaEnCours() -> scene -> toImage();
-		image.save(&fichier, "PNG");
-		fichier.close();
+		QFile file(nom_fichier);
+		QImage image = schemaInProgress() -> scene -> toImage();
+		image.save(&file, "PNG");
+		file.close();
 	}
 }
 
 /**
-	Methode enregistrant le schema dans le dernier nom de fichier connu.
-	Si aucun nom de fichier n'est connu, cette methode appelle la methode enregistrer_sous
+	Methode enregistrant le schema dans le dernier nom de file connu.
+	Si aucun nom de file n'est connu, cette methode appelle la methode enregistrer_sous
 	@return true si l'enregistrement a reussi, false sinon
 */
 bool QETApp::enregistrer() {
-	if (!schemaEnCours()) return(false);
-	return(schemaEnCours() -> enregistrer());
+	if (!schemaInProgress()) return(false);
+	return(schemaInProgress() -> enregistrer());
 }
 
 /**
-	Cette methode demande un nom de fichier a l'utilisateur pour enregistrer le schema
-	Si aucun nom n'est entre, elle renvoie faux.
-	Si le nom ne se termine pas par l'extension .qet, celle-ci est ajoutee.
-	Si l'enregistrement reussit, le nom du fichier est conserve et la fonction renvoie true.
-	Sinon, faux est renvoye.
-	@return true si l'enregistrement a reussi, false sinon
-	@todo detecter le chemin du bureau automatiquement
+
+This method asks the user for a file name to save the schema
+If no name is entered, it returns false.
+If the name does not end with the .qet extension, it is added.
+If the save is successful, the file name is kept and the function returns true.
+Otherwise, false is returned.
+@return true if the registration was successful, false otherwise
+@todo detect the desktop path automatically
 */
 bool QETApp::dialogue_enregistrer_sous() {
-	if (!schemaEnCours()) return(false);
-	return(schemaEnCours() -> enregistrer_sous());
+	if (!schemaInProgress()) return(false);
+	return(schemaInProgress() -> enregistrer_sous());
 }
 
 /**
@@ -496,47 +510,47 @@ bool QETApp::dialogue_enregistrer_sous() {
 	@return true si tout s'est bien passe ; false si vous executez cette fonction dans un univers non cartesien (en fait y'a pas de return(false) :p)
 */
 bool QETApp::nouveau() {
-	addSchemaVue(new SchemaVue(this));
+	addSchemaVue(new SchemaView(this));
 	return(true);
 }
 
 /**
-	Cette fonction demande un nom de fichier a ouvrir a l'utilisateur
+	Cette fonction demande un nom de file a open a l'utilisateur
 	@return true si l'ouverture a reussi, false sinon
 */
-bool QETApp::ouvrir() {
-	// demande un nom de fichier a ouvrir a l'utilisateur
+bool QETApp::open() {
+	// demande un nom de file a open a l'utilisateur
 	QString nom_fichier = QFileDialog::getOpenFileName(
 		this,
-		tr("Ouvrir un fichier"),
+		tr("open un file"),
 		QDir::homePath(),
-		tr("Schema QelectroTech (*.qet);;Fichiers XML (*.xml);;Tous les fichiers (*)")
+		tr("Schema QelectroTech (*.qet);;Files XML (*.xml);;Tous les files (*)")
 	);
 	if (nom_fichier == "") return(false);
 	
-	// verifie que le fichier n'est pas deja ouvert
+	// verifie que le file n'est pas deja ouvert
 	QString chemin_fichier = QFileInfo(nom_fichier).canonicalFilePath();
 	foreach (QWidget *fenetre, workspace.windowList()) {
-		SchemaVue *fenetre_en_cours = qobject_cast<SchemaVue *>(fenetre);
+		SchemaView *fenetre_en_cours = qobject_cast<SchemaView *>(fenetre);
 		if (QFileInfo(fenetre_en_cours -> nom_fichier).canonicalFilePath() == chemin_fichier) {
 			workspace.setActiveWindow(fenetre);
 			return(false);
 		}
 	}
 	
-	// ouvre le fichier
-	SchemaVue *sv = new SchemaVue(this);
+	// ouvre le file
+	SchemaView *sv = new SchemaView(this);
 	int code_erreur;
-	if (sv -> ouvrir(nom_fichier, &code_erreur)) {
+	if (sv -> open(nom_fichier, &code_erreur)) {
 		addSchemaVue(sv);
 		return(true);
 	} else {
 		QString message_erreur;
 		switch(code_erreur) {
-			case 1: message_erreur = tr("Ce fichier n'existe pas."); break;
-			case 2: message_erreur = tr("Impossible de lire ce fichier."); break;
-			case 3: message_erreur = tr("Ce fichier n'est pas un document XML valide."); break;
-			case 4: message_erreur = tr("Une erreur s'est produite lors de l'ouverture du fichier."); break;
+			case 1: message_erreur = tr("Ce file n'existe pas."); break;
+			case 2: message_erreur = tr("Impossible de lire ce file."); break;
+			case 3: message_erreur = tr("Ce file n'est pas un document XML valide."); break;
+			case 4: message_erreur = tr("Une erreur s'est produite lors de l'ouverture du file."); break;
 		}
 		QMessageBox::warning(this, tr("Erreur"), message_erreur);
 		delete sv;
@@ -546,11 +560,11 @@ bool QETApp::ouvrir() {
 
 /**
 	Ferme le document courant
-	@return true si la fermeture du fichier a reussi, false sinon
+	@return true si la fermeture du file a reussi, false sinon
 	@todo detecter les modifications et ne demander que si besoin est
 */
 bool QETApp::fermer() {
-	SchemaVue *sv = schemaEnCours();
+	SchemaView *sv = schemaInProgress();
 	if (!sv) return(false);
 	bool fermeture_schema = sv -> close();
 	if (fermeture_schema) delete sv;
@@ -558,76 +572,79 @@ bool QETApp::fermer() {
 }
 
 /**
-	@return Le SchemaVue qui a le focus dans l'interface MDI
+	@return Le SchemaView qui a le focus dans l'interface MDI
 */
-SchemaVue *QETApp::schemaEnCours() {
-	return(qobject_cast<SchemaVue *>(workspace.activeWindow()));
+SchemaView *QETApp::schemaInProgress() {
+	trace_msg("");
+	auto ret = qobject_cast<SchemaView *>(workspace.activeWindow());
+	return ret;
+	//return(qobject_cast<SchemaView *>(workspace.activeWindow()));
 }
 
-void QETApp::slot_couper() {
-	if(schemaEnCours()) schemaEnCours() -> couper();
+void QETApp::slot_cut() {
+	if(schemaInProgress()) schemaInProgress() -> couper();
 }
 
 void QETApp::slot_copier() {
-	if(schemaEnCours()) schemaEnCours() -> copier();
+	if(schemaInProgress()) schemaInProgress() -> copier();
 }
 
-void QETApp::slot_coller() {
-	if(schemaEnCours()) schemaEnCours() -> coller();
+void QETApp::slot_paste() {
+	if(schemaInProgress()) schemaInProgress() -> coller();
 }
 
 void QETApp::slot_zoomPlus() {
-	if(schemaEnCours()) schemaEnCours() -> zoomPlus();
+	if(schemaInProgress()) schemaInProgress() -> zoomPlus();
 }
 
 void QETApp::slot_zoomMoins() {
-	if(schemaEnCours()) schemaEnCours() -> zoomMoins();
+	if(schemaInProgress()) schemaInProgress() -> zoomMoins();
 }
 
 void QETApp::slot_zoomFit() {
-	if(schemaEnCours()) schemaEnCours() -> zoomFit();
+	if(schemaInProgress()) schemaInProgress() -> zoomFit();
 }
 
 void QETApp::slot_zoomReset() {
-	if(schemaEnCours()) schemaEnCours() -> zoomReset();
+	if(schemaInProgress()) schemaInProgress() -> zoomReset();
 }
 
 void QETApp::slot_selectAll() {
-	if(schemaEnCours()) schemaEnCours() -> selectAll();
+	if(schemaInProgress()) schemaInProgress() -> selectAll();
 }
 
 void QETApp::slot_selectNothing() {
-	if(schemaEnCours()) schemaEnCours() -> selectNothing();
+	if(schemaInProgress()) schemaInProgress() -> selectNothing();
 }
 
 void QETApp::slot_selectInvert() {
-	if(schemaEnCours()) schemaEnCours() -> selectInvert();
+	if(schemaInProgress()) schemaInProgress() -> selectInvert();
 }
 
 void QETApp::slot_supprimer() {
-	if(schemaEnCours()) schemaEnCours() -> supprimer();
+	if(schemaInProgress()) schemaInProgress() -> supprimer();
 }
 
 void QETApp::slot_pivoter() {
-	if(schemaEnCours()) schemaEnCours() -> pivoter();
+	if(schemaInProgress()) schemaInProgress() -> pivoter();
 }
 
 void QETApp::slot_setSelectionMode() {
-	if(schemaEnCours()) schemaEnCours() -> setSelectionMode();
+	if(schemaInProgress()) schemaInProgress() -> setSelectionMode();
 }
 
 void QETApp::slot_setVisualisationMode() {
-	if(schemaEnCours()) schemaEnCours() -> setVisualisationMode();
+	if(schemaInProgress()) schemaInProgress() -> setVisualisationMode();
 }
 
 /**
-	gere les actions ayant besoin d'un document ouvert
+	manages actions requiring an open document
 */
 void QETApp::slot_updateActions() {
-	SchemaVue *sv = schemaEnCours();
+	SchemaView *sv = schemaInProgress();
 	bool document_ouvert = (sv != 0);
 	
-	// actions ayant juste besoin d'un document ouvert
+	// actions that just need an open document
 	fermer_fichier   -> setEnabled(document_ouvert);
 	enr_fichier      -> setEnabled(document_ouvert);
 	enr_fichier_sous -> setEnabled(document_ouvert);
@@ -689,9 +706,9 @@ void QETApp::slot_updateActions() {
 	slot_updateMenuFenetres();
 }
 
-void QETApp::addSchemaVue(SchemaVue *sv) {
+void QETApp::addSchemaVue(SchemaView *sv) {
 	if (!sv) return;
-	SchemaVue *s_v = schemaEnCours();
+	SchemaView *s_v = schemaInProgress();
 	bool maximise = ((!s_v) || (s_v -> windowState() & Qt::WindowMaximized));
 	QWidget *p = workspace.addWindow(sv);
 	connect(sv, SIGNAL(selectionChanged()), this, SLOT(slot_updateActions()));
@@ -702,31 +719,31 @@ void QETApp::addSchemaVue(SchemaVue *sv) {
 
 void QETApp::slot_updateMenuFenetres() {
 	// nettoyage du menu
-	menu_fenetres -> clear();
+	menu_windows -> clear();
 	
 	// actions de fermeture
-	menu_fenetres -> addAction(fermer_fichier);
-	//menu_fenetres -> addAction(closeAllAct);
+	menu_windows -> addAction(fermer_fichier);
+	//menu_windows -> addAction(closeAllAct);
 	
-	// actions de reorganisation des fenetres
-	menu_fenetres -> addSeparator();
-	menu_fenetres -> addAction(f_mosaique);
-	menu_fenetres -> addAction(f_cascade);
-	menu_fenetres -> addAction(f_reorganise);
+	// actions de reorganisation des windows
+	menu_windows -> addSeparator();
+	menu_windows -> addAction(f_mosaique);
+	menu_windows -> addAction(f_cascade);
+	menu_windows -> addAction(f_reorganise);
 	
-	// actiosn de deplacement entre les fenetres
-	menu_fenetres -> addSeparator();
-	menu_fenetres -> addAction(f_suiv);
-	menu_fenetres -> addAction(f_prec);
+	// actiosn de deplacement entre les windows
+	menu_windows -> addSeparator();
+	menu_windows -> addAction(f_suiv);
+	menu_windows -> addAction(f_prec);
 	
-	// liste des fenetres
-	QList<QWidget *> fenetres = workspace.windowList();
-	if (!fenetres.isEmpty()) menu_fenetres -> addSeparator();
-	for (int i = 0 ; i < fenetres.size() ; ++ i) {
-		SchemaVue *sv = qobject_cast<SchemaVue *>(fenetres.at(i));
-		QAction *action  = menu_fenetres -> addAction(sv -> windowTitle().left(sv -> windowTitle().length()-3));
+	// liste des windows
+	QList<QWidget *> windows = workspace.windowList();
+	if (!windows.isEmpty()) menu_windows -> addSeparator();
+	for (int i = 0 ; i < windows.size() ; ++ i) {
+		SchemaView *sv = qobject_cast<SchemaView *>(windows.at(i));
+		QAction *action  = menu_windows -> addAction(sv -> windowTitle().left(sv -> windowTitle().length()-3));
 		action -> setCheckable(true);
-		action -> setChecked(sv == schemaEnCours());
+		action -> setChecked(sv == schemaInProgress());
 		connect(action, SIGNAL(triggered()), &windowMapper, SLOT(map()));
 		windowMapper.setMapping(action, sv);
 	}

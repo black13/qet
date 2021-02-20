@@ -88,22 +88,22 @@ QWidget *AboutQET::ongletLicence() {
 	// label
 	QLabel *titre_licence = new QLabel(tr("Ce programme est sous licence GNU/GPL."));
 	
-	// Recuperation du texte de la GNU/GPL dans un fichier externe
+	// Recuperation du texte de la GNU/GPL dans un file externe
 	QFile *fichier_gpl = new QFile("./gnugpl.txt");
 	QString txt_gpl;
-	// verifie que le fichier existe
+	// verifie que le file existe
 	if (!fichier_gpl -> exists()) {
-		txt_gpl = QString(tr("Le fichier texte contenant la licence GNU/GPL est introuvable - bon bah de toute fa\347on, vous la connaissez par coeur non ?"));
+		txt_gpl = QString(tr("Le file texte contenant la licence GNU/GPL est introuvable - bon bah de toute fa\347on, vous la connaissez par coeur non ?"));
 	} else {
-		// ouvre le fichier en mode texte et en lecture seule
+		// ouvre le file en mode texte et en lecture seule
 		if (!fichier_gpl -> open(QIODevice::ReadOnly | QIODevice::Text)) {
-			txt_gpl = QString(tr("Le fichier texte contenant la licence GNU/GPL existe mais n'a pas pu \352tre ouvert - bon bah de toute fa\347on, vous la connaissez par coeur non ?"));
+			txt_gpl = QString(tr("Le file texte contenant la licence GNU/GPL existe mais n'a pas pu \352tre ouvert - bon bah de toute fa\347on, vous la connaissez par coeur non ?"));
 		} else {
-			// charge le contenu du fichier dans une QString
+			// charge le contenu du file dans une QString
 			QTextStream in(fichier_gpl);
 			txt_gpl = QString("");
 			while (!in.atEnd()) txt_gpl += in.readLine()+"\n";
-			// ferme le fichier
+			// ferme le file
 			fichier_gpl -> close();
 		}
 	}

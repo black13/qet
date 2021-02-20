@@ -13,8 +13,8 @@ DEL::DEL(QGraphicsItem *parent, Schema *scene) : ElementFixe(parent, scene) {
 	setHotspot(QPoint(15, 5));
 	
 	// ajout de deux bornes a l'element
-	new Borne(0,  0, Borne::Nord, this, scene);
-	new Borne(0, 60, Borne::Sud,  this, scene);
+	new Terminal(0,  0, Terminal::Nord, this, scene);
+	new Terminal(0, 60, Terminal::Sud,  this, scene);
 	
 	peut_relier_ses_propres_bornes = true;
 }
@@ -38,7 +38,7 @@ void DEL::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 	t.setWidthF(1.0);
 	p -> setPen(t);
 	
-	// un cercle a fond blanc
+	// a circle with a white background
 	p -> setBrush(QBrush(Qt::white, Qt::SolidPattern));
 	p -> drawEllipse(-10, 20, 20, 20);
 	p -> setBrush(Qt::NoBrush);

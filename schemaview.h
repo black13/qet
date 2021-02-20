@@ -1,20 +1,22 @@
 #ifndef SCHEMAVUE_H
 	#define SCHEMAVUE_H
 	#include <QtGui>
+    #include <QDebug>
+    #include <QUuid>
 	class Schema;
 	#include "element.h"
-	#include "conducteur.h"
+	#include "conductor.h"
 	#define TAILLE_GRILLE 10
 	/**
-		Classe representant un SchemaVue electrique
-		@todo creer une structure capable de retenir les differents composants du SchemaVue : elements, fils, indications eventuelles => revoir les SchemaVues
+		Classe representant un SchemaView electrique
+		@todo creer une structure capable de retenir les differents composants du SchemaView : elements, fils, indications eventuelles => revoir les SchemaVues
 	*/
-	class SchemaVue : public QGraphicsView {
+	class SchemaView : public QGraphicsView {
 		Q_OBJECT
 		public:
 		// constructeurs
-		SchemaVue();
-		SchemaVue(QWidget * = 0);
+		SchemaView();
+		SchemaView(QWidget * = 0);
 		
 		// nouveaux attributs
 		Schema *scene;
@@ -22,16 +24,16 @@
 		// methodes publiques
 		bool antialiased() const;
 		void setAntialiasing(bool);
-		bool ouvrir(QString, int * = NULL);
+		bool open(QString, int * = NULL);
 		void closeEvent(QCloseEvent *);
 		QString nom_fichier;
 		bool enregistrer();
 		bool enregistrer_sous();
-		
+		QUuid   m_uuid;
 		private:
 		bool private_enregistrer(QString &);
 		void initialise();
-		bool antialiasing; // booleen indiquant s'il faut effectuer un antialiasing sur le rendu graphique du SchemaVue
+		bool antialiasing; // booleen indiquant s'il faut effectuer un antialiasing sur le rendu graphique du SchemaView
 		QList<QGraphicsItem *> garbage;
 		
 		void throwToGarbage(QGraphicsItem *);

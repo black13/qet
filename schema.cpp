@@ -1,6 +1,6 @@
 #include <math.h>
-#include "conducteur.h"
-#include "contacteur.h"
+#include "conductor.h"
+#include "contactor.h"
 #include "elementperso.h"
 #include "schema.h"
 
@@ -114,7 +114,7 @@ QDomDocument Schema::toXml(bool schema) {
 	
 	// creation de deux listes : une qui contient les elements, une qui contient les conducteurs
 	QList<Element *> liste_elements;
-	QList<Conducteur *> liste_conducteurs;
+	QList<Conductor *> liste_conducteurs;
 	
 	
 	// Determine les elements a « XMLiser »
@@ -122,7 +122,7 @@ QDomDocument Schema::toXml(bool schema) {
 		if (Element *elmt = qgraphicsitem_cast<Element *>(qgi)) {
 			if (schema) liste_elements << elmt;
 			else if (elmt -> isSelected()) liste_elements << elmt;
-		} else if (Conducteur *f = qgraphicsitem_cast<Conducteur *>(qgi)) {
+		} else if (Conductor *f = qgraphicsitem_cast<Conductor *>(qgi)) {
 			if (schema) liste_conducteurs << f;
 			// lorsqu'on n'exporte pas tout le schema, il faut retirer les conducteurs non selectionnes
 			// et pour l'instant, les conducteurs non selectionnes sont les conducteurs dont un des elements n'est pas relie
@@ -134,7 +134,7 @@ QDomDocument Schema::toXml(bool schema) {
 	if (liste_elements.isEmpty()) return(document);
 	int id_borne = 0;
 	// table de correspondance entre les adresses des bornes et leurs ids
-	QHash<Borne *, int> table_adr_id;
+	QHash<Terminal *, int> table_adr_id;
 	QDomElement elements = document.createElement("elements");
 	foreach(Element *elmt, liste_elements) {
 		QDomElement element = document.createElement("element");
@@ -151,7 +151,7 @@ QDomDocument Schema::toXml(bool schema) {
 		// pour chaque enfant de l'element
 		foreach(QGraphicsItem *child, elmt -> children()) {
 			// si cet enfant est une borne
-			if (Borne *p = qgraphicsitem_cast<Borne *>(child)) {
+			if (Terminal *p = qgraphicsitem_cast<Terminal *>(child)) {
 				// alors on enregistre la borne
 				QDomElement borne = p -> toXml(document);
 				borne.setAttribute("id", id_borne);
@@ -172,7 +172,7 @@ QDomDocument Schema::toXml(bool schema) {
 	// enregistrement des conducteurs
 	if (liste_conducteurs.isEmpty()) return(document);
 	QDomElement conducteurs = document.createElement("conducteurs");
-	foreach(Conducteur *f, liste_conducteurs) {
+	foreach(Conductor *f, liste_conducteurs) {
 		QDomElement conducteur = document.createElement("conducteur");
 		conducteur.setAttribute("borne1", table_adr_id.value(f -> borne1));
 		conducteur.setAttribute("borne2", table_adr_id.value(f -> borne2));
@@ -206,11 +206,11 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 	// si la racine n'a pas d'enfant : le chargement est fini (schema vide)
 	if (racine.firstChild().isNull()) return(true);
 	
-	// chargement de tous les Elements du fichier XML
+	// chargement de tous les Elements du file XML
 	QList<Element *> elements_ajoutes;
 	//uint nb_elements = 0;
-	QHash< int, Borne *> table_adr_id;
-	QHash< int, Borne *> &ref_table_adr_id = table_adr_id;
+	QHash< int, Terminal *> table_adr_id;
+	QHash< int, Terminal *> &ref_table_adr_id = table_adr_id;
 	for (QDomNode node = racine.firstChild() ; !node.isNull() ; node = node.nextSibling()) {
 		// on s'interesse a l'element XML "elements" (= groupe d'elements)
 		QDomElement elmts = node.toElement();
@@ -254,7 +254,7 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 		}
 	}
 	
-	// chargement de tous les Conducteurs du fichier XML
+	// chargement de tous les Conducteurs du file XML
 	for (QDomNode node = racine.firstChild() ; !node.isNull() ; node = node.nextSibling()) {
 		// on s'interesse a l'element XML "conducteurs" (= groupe de conducteurs)
 		QDomElement conducteurs = node.toElement();
@@ -263,19 +263,19 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 		for (QDomNode n = conducteurs.firstChild() ; !n.isNull() ; n = n.nextSibling()) {
 			// on s'interesse a l'element XML "element" (elements eux-memes)
 			QDomElement f = n.toElement();
-			if (f.isNull() || !Conducteur::valideXml(f)) continue;
+			if (f.isNull() || !Conductor::valideXml(f)) continue;
 			// verifie que les bornes que le conducteur relie sont connues
 			int id_p1 = f.attribute("borne1").toInt();
 			int id_p2 = f.attribute("borne2").toInt();
 			if (table_adr_id.contains(id_p1) && table_adr_id.contains(id_p2)) {
 				// pose le conducteur... si c'est possible
-				Borne *p1 = table_adr_id.value(id_p1);
-				Borne *p2 = table_adr_id.value(id_p2);
+				Terminal *p1 = table_adr_id.value(id_p1);
+				Terminal *p2 = table_adr_id.value(id_p2);
 				if (p1 != p2) {
 					bool peut_poser_conducteur = true;
 					bool cia = ((Element *)p2 -> parentItem()) -> connexionsInternesAcceptees();
 					if (!cia) foreach(QGraphicsItem *item, p2 -> parentItem() -> children()) if (item == p1) peut_poser_conducteur = false;
-					if (peut_poser_conducteur) new Conducteur(table_adr_id.value(id_p1), table_adr_id.value(id_p2), 0, this);
+					if (peut_poser_conducteur) new Conductor(table_adr_id.value(id_p1), table_adr_id.value(id_p2), 0, this);
 				}
 			} else qDebug() << "Le chargement du conducteur" << id_p1 << id_p2 << "a echoue";
 		}
@@ -289,13 +289,13 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 	@param table_id_adr Table de correspondance entre les entiers et les bornes
 	@return true si l'ajout a parfaitement reussi, false sinon 
 */
-Element *Schema::elementFromXml(QDomElement &e, QHash<int, Borne *> &table_id_adr) {
+Element *Schema::elementFromXml(QDomElement &e, QHash<int, Terminal *> &table_id_adr) {
 	// cree un element dont le type correspond à l'id type
 	QString type = e.attribute("type");
 	int etat;
 	Element *nvel_elmt = new ElementPerso(type, 0, 0, &etat);
 	/*switch(e.attribute("type").toInt()) {
-		case 0: nvel_elmt = new Contacteur(); break;
+		case 0: nvel_elmt = new Contactor(); break;
 		case 1: nvel_elmt = new DEL();        break;
 		case 2: nvel_elmt = new Entree();     break;
 	}*/

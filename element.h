@@ -1,7 +1,7 @@
 #ifndef ELEMENT_H
 	#define ELEMENT_H
 	#include <QtGui>
-	#include "borne.h"
+	#include "terminal.h"
 	class Schema;
 	class Element : public QGraphicsItem {
 		public:
@@ -31,7 +31,7 @@
 		void     setPos(qreal, qreal);
 		bool     connexionsInternesAcceptees() { return(peut_relier_ses_propres_bornes); }
 		static bool     valideXml(QDomElement &);
-		virtual bool fromXml(QDomElement &, QHash<int, Borne *>&) = 0;
+		virtual bool fromXml(QDomElement &, QHash<int, Terminal *>&) = 0;
 		
 		protected:
 		void drawAxes(QPainter *, const QStyleOptionGraphicsItem *);

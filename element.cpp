@@ -1,7 +1,7 @@
 #include "element.h"
 #include "schema.h"
 #include <QtDebug>
-
+#include "debug.h"
 /*** Methodes publiques ***/
 
 /**
@@ -104,7 +104,7 @@ QPixmap Element::pixmap() {
 QVariant Element::itemChange(GraphicsItemChange change, const QVariant &value) {
 	if (change == QGraphicsItem::ItemPositionChange || change == QGraphicsItem::ItemSelectedChange) {
 		foreach(QGraphicsItem *qgi, children()) {
-			if (Borne *p = qgraphicsitem_cast<Borne *>(qgi)) p -> updateConducteur();
+			if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) p -> updateConducteur();
 		}
 	}
 	return(QGraphicsItem::itemChange(change, value));
@@ -138,9 +138,10 @@ bool Element::invertOrientation() {
 /*** Methodes protegees ***/
 
 /**
-	Dessine un petit repere (axes x et y) relatif a l'element
-	@param painter Le QPainter a utiliser pour dessiner les axes
-	@param options Les options de style a prendre en compte
+
+Draw a small coordinate system (x and y axes) relative to the element
+@param painter The QPainter to use to draw the axes
+@param options The style options to take into account
 */
 void Element::drawAxes(QPainter *painter, const QStyleOptionGraphicsItem *) {
 	painter -> setPen(Qt::blue);
@@ -156,11 +157,14 @@ void Element::drawAxes(QPainter *painter, const QStyleOptionGraphicsItem *) {
 /*** Methodes privees ***/
 
 /**
-	Dessine le cadre de selection de l'element de maniere systematiquement non antialiasee.
-	@param qp Le QPainter a utiliser pour dessiner les bornes.
-	@param options Les options de style a prendre en compte
+
+Draws the selection frame of the element in a systematically non-anti-aliasing manner.
+@param qp The QPainter to use for drawing the terminals.
+@param options The style options to take into account
  */
 void Element::drawSelection(QPainter *painter, const QStyleOptionGraphicsItem *) {
+
+	
 	painter -> save();
 	// Annulation des renderhints
 	painter -> setRenderHint(QPainter::Antialiasing,          false);
@@ -194,9 +198,9 @@ void Element::updatePixmap() {
 }
 
 /**
-	Change la position de l'element en veillant a ce que l'element
-	reste sur la grille du Schema auquel il appartient.
-	@param p Nouvelles coordonnees de l'element
+Change the position of the element making sure that the element
+remains on the grid of the Schema to which it belongs.
+@param p New element coordinates
 */
 void Element::setPos(const QPointF &p) {
 	if (p == pos()) return;
@@ -210,7 +214,7 @@ void Element::setPos(const QPointF &p) {
 	} else QGraphicsItem::setPos(p);
 	// actualise les bornes / conducteurs
 	foreach(QGraphicsItem *qgi, children()) {
-		if (Borne *p = qgraphicsitem_cast<Borne *>(qgi)) p -> updateConducteur();
+		if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) p -> updateConducteur();
 	}
 }
 
@@ -228,6 +232,10 @@ void Element::setPos(qreal x, qreal y) {
 	Gere les mouvements de souris lies a l'element, notamment
 */
 void Element::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
+
+	trace_msg("mousemovevent");
+	//int ret = _CrtDbgReportW(_CRT_ERROR, _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(QT_VERSION_STR), reinterpret_cast<const wchar_t *> (QString::fromLatin1("video/").utf16()));
+	
 	/*&& (flags() & ItemIsMovable)*/ // on le sait qu'il est movable
 	if (e -> buttons() & Qt::LeftButton) {
 		QPointF oldPos = pos();

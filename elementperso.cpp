@@ -6,7 +6,7 @@ ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, 
 	// pessimisme inside : par defaut, ca foire
 	elmt_etat = -1;
 	
-	// le fichier doit exister
+	// The file must exist
 	QString chemin_elements = "elements/";
 	nomfichier = chemin_elements + nom_fichier;
 	if (!QFileInfo(nomfichier).exists()) {
@@ -15,25 +15,25 @@ ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, 
 		return;
 	}
 	
-	// le fichier doit etre lisible
-	QFile fichier(nomfichier);
-	if (!fichier.open(QIODevice::ReadOnly)) {
+	// The file must be readable
+	QFile file(nomfichier);
+	if (!file.open(QIODevice::ReadOnly)) {
 		if (etat != NULL) *etat = 2;
 		elmt_etat = 2;
 		return;
 	}
 	
-	// le fichier doit etre un document XML
+	// le file doit etre un document XML
 	QDomDocument document_xml;
-	if (!document_xml.setContent(&fichier)) {
+	if (!document_xml.setContent(&file)) {
 		if (etat != NULL) *etat = 3;
 		elmt_etat = 3;
 		return;
 	}
 	
-	// la racine est supposee etre une definition d'element 
-	QDomElement racine = document_xml.documentElement();
-	if (racine.tagName() != "definition" || racine.attribute("type") != "element") {
+	// la root est supposee etre une definition d'element 
+	QDomElement root = document_xml.documentElement();
+	if (root.tagName() != "definition" || root.attribute("type") != "element") {
 		if (etat != NULL) *etat = 4;
 		elmt_etat = 4;
 		return;
@@ -42,11 +42,11 @@ ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, 
 	// ces attributs doivent etre presents et valides
 	int w, h, hot_x, hot_y;
 	if (
-		racine.attribute("nom") == QString("") ||\
-		!attributeIsAnInteger(racine, QString("width"), &w) ||\
-		!attributeIsAnInteger(racine, QString("height"), &h) ||\
-		!attributeIsAnInteger(racine, QString("hotspot_x"), &hot_x) ||\
-		!attributeIsAnInteger(racine, QString("hotspot_y"), &hot_y)
+		root.attribute("nom") == QString("") ||\
+		!attributeIsAnInteger(root, QString("width"), &w) ||\
+		!attributeIsAnInteger(root, QString("height"), &h) ||\
+		!attributeIsAnInteger(root, QString("hotspot_x"), &hot_x) ||\
+		!attributeIsAnInteger(root, QString("hotspot_y"), &hot_y)
 	) {
 		if (etat != NULL) *etat = 5;
 		elmt_etat = 5;
@@ -54,12 +54,12 @@ ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, 
 	}
 	
 	// on peut d'ores et deja specifier le nom, la taille et le hotspot
-	priv_nom = racine.attribute("nom");
+	priv_nom = root.attribute("nom");
 	setSize(w, h);
 	setHotspot(QPoint(hot_x, hot_y));
 	
 	// la definition est supposee avoir des enfants
-	if (racine.firstChild().isNull()) {
+	if (root.firstChild().isNull()) {
 		if (etat != NULL) *etat = 6;
 		elmt_etat = 6;
 		return;
@@ -74,7 +74,7 @@ ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, 
 	t.setWidthF(1.0);
 	t.setJoinStyle(Qt::MiterJoin);
 	qp.setPen(t);
-	for (QDomNode node = racine.firstChild() ; !node.isNull() ; node = node.nextSibling()) {
+	for (QDomNode node = root.firstChild() ; !node.isNull() ; node = node.nextSibling()) {
 		QDomElement elmts = node.toElement();
 		if(elmts.isNull()) continue;
 		if (parseElement(elmts, qp, s)) ++ nb_elements_parses;
@@ -93,8 +93,8 @@ ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, 
 		return;
 	}
 	
-	// fermeture du fichier
-	fichier.close();
+	// fermeture du file
+	file.close();
 	
 	if (etat != NULL) *etat = 0;
 	elmt_etat = 0;
@@ -130,7 +130,8 @@ bool ElementPerso::parseLigne(QDomElement &e, QPainter &qp) {
 }
 
 bool ElementPerso::parseCercle(QDomElement &e, QPainter &qp) {
-	// verifie la presence des attributs obligatoires
+
+	// check the presence of mandatory attributes
 	int cercle_x, cercle_y, cercle_r;
 	if (!attributeIsAnInteger(e, QString("x"),     &cercle_x)) return(false);
 	if (!attributeIsAnInteger(e, QString("y"),     &cercle_y)) return(false);
@@ -148,31 +149,32 @@ bool ElementPerso::parsePolygone(QDomElement &e, QPainter &qp) {
 		else break;
 	}
 	if (i < 3) return(false);
-	QPointF points[i-1];
+	//QPointF points[i-1];
+	QPolygonF qpf(i - 1);
 	for (int j = 1 ; j < i ; ++ j) {
-		points[j-1] = QPointF(
+		qpf.push_back( QPointF(
 			e.attribute(QString("x%1").arg(j)).toDouble(),
 			e.attribute(QString("y%1").arg(j)).toDouble()
-		);
+		));
 	}
 	setQPainterAntiAliasing(&qp, e.attribute("antialias") == "true");
-	qp.drawPolygon(points, i-1);
+	qp.drawPolygon(qpf);
 	return(true);
 }
 
 bool ElementPerso::parseBorne(QDomElement &e, Schema *s) {
 	// verifie la presence et la validite des attributs obligatoires
 	int bornex, borney;
-	Borne::Orientation borneo;
+	Terminal::Orientation borneo;
 	if (!attributeIsAnInteger(e, QString("x"), &bornex)) return(false);
 	if (!attributeIsAnInteger(e, QString("y"), &borney)) return(false);
 	if (!e.hasAttribute("orientation")) return(false);
-	if (e.attribute("orientation") == "n") borneo = Borne::Nord;
-	else if (e.attribute("orientation") == "s") borneo = Borne::Sud;
-	else if (e.attribute("orientation") == "e") borneo = Borne::Est;
-	else if (e.attribute("orientation") == "o") borneo = Borne::Ouest;
+	if (e.attribute("orientation") == "n") borneo = Terminal::Nord;
+	else if (e.attribute("orientation") == "s") borneo = Terminal::Sud;
+	else if (e.attribute("orientation") == "e") borneo = Terminal::Est;
+	else if (e.attribute("orientation") == "o") borneo = Terminal::Ouest;
 	else return(false);
-	new Borne(bornex, borney, borneo, this, s);
+	new Terminal(bornex, borney, borneo, this, s);
 	++ nb_bornes;
 	return(true);
 }

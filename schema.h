@@ -4,8 +4,10 @@
 	#define GRILLE_Y 10
 	#include <QtGui>
 	#include <QtXml>
+    #include <QDebug>
+    #include <QUuid>
 	class Element;
-	class Borne;
+	class Terminal;
 	class Schema : public QGraphicsScene {
 		Q_OBJECT
 		public:
@@ -35,8 +37,8 @@
 		QString titre;
 		QString folio;       // vraiment necessaire ce truc ?
 		QString nom_fichier; // meme remarque
-		Element *elementFromXml(QDomElement &e, QHash<int, Borne *> &);
-		
+		Element *elementFromXml(QDomElement &e, QHash<int, Terminal *> &);
+
 		private slots:
 		void slot_checkSelectionChange();
 		

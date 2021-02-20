@@ -20,13 +20,13 @@ int ElementFixe::nbBornesMax() const {
 }
 
 /**
-	Methode d'import XML. Cette methode est appelee lors de l'import de contenu XML (coller, import, ouverture de fichier...) afin que l'element puisse gerer lui-meme l'importation de ses bornes. Ici, comme cette classe est caracterisee par un nombre fixe de bornes, l'implementation exige de retrouver exactement ses bornes dans le fichier XML.
+	Methode d'import XML. Cette methode est appelee lors de l'import de contenu XML (coller, import, ouverture de file...) afin que l'element puisse gerer lui-meme l'importation de ses bornes. Ici, comme cette classe est caracterisee par un nombre fixe de bornes, l'implementation exige de retrouver exactement ses bornes dans le file XML.
 	@param e L'element XML a analyser.
-	@param table_id_adr Reference vers la table de correspondance entre les IDs du fichier XML et les adresses en memoire. Si l'import reussit, il faut y ajouter les bons couples (id, adresse).
+	@param table_id_adr Reference vers la table de correspondance entre les IDs du file XML et les adresses en memoire. Si l'import reussit, il faut y ajouter les bons couples (id, adresse).
 	@return true si l'import a reussi, false sinon
 	
 */
-bool ElementFixe::fromXml(QDomElement &e, QHash<int, Borne *> &table_id_adr) {
+bool ElementFixe::fromXml(QDomElement &e, QHash<int, Terminal *> &table_id_adr) {
 	/*
 		les bornes vont maintenant etre recensees pour associer leurs id à leur adresse reelle
 		ce recensement servira lors de la mise en place des fils
@@ -42,14 +42,14 @@ bool ElementFixe::fromXml(QDomElement &e, QHash<int, Borne *> &table_id_adr) {
 		for (QDomNode node_borne = bornes.firstChild() ; !node_borne.isNull() ; node_borne = node_borne.nextSibling()) {
 			// on s'interesse a l'element XML "borne"
 			QDomElement borne = node_borne.toElement();
-			if (!borne.isNull() && Borne::valideXml(borne)) liste_bornes.append(borne);
+			if (!borne.isNull() && Terminal::valideXml(borne)) liste_bornes.append(borne);
 		}
 	}
 	
-	QHash<int, Borne *> priv_id_adr;
+	QHash<int, Terminal *> priv_id_adr;
 	int bornes_non_trouvees = 0;
 	foreach(QGraphicsItem *qgi, children()) {
-		if (Borne *p = qgraphicsitem_cast<Borne *>(qgi)) {
+		if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) {
 			bool borne_trouvee = false;
 			foreach(QDomElement qde, liste_bornes) {
 				if (p -> fromXml(qde)) {

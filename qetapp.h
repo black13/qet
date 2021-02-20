@@ -1,7 +1,8 @@
 #ifndef QETAPP_H
 	#define QETAPP_H
 	#include <QtGui>
-	class SchemaVue;
+    #include <qdebug.h>
+	class SchemaView;
 	class PanelAppareils;
 	/**
 		Cette classe represente la fenetre principale de QElectroTech et,
@@ -14,7 +15,7 @@
 		public:
 		QETApp(QWidget *parent=0);
 		void closeEvent(QCloseEvent * event );
-		void addSchemaVue(SchemaVue *);
+		void addSchemaVue(SchemaView *);
 		
 		public slots:
 		void systray(QSystemTrayIcon::ActivationReason raison);
@@ -29,7 +30,7 @@
 		bool dialogue_enregistrer_sous();
 		bool enregistrer();
 		bool nouveau();
-		bool ouvrir();
+		bool open();
 		bool fermer();
 		
 		protected:
@@ -37,7 +38,7 @@
 		QAction *mode_selection;
 		QAction *mode_visualise;
 		QAction *nouveau_fichier;
-		QAction *ouvrir_fichier;
+		QAction *open_fichier;
 		QAction *fermer_fichier;
 		QAction *enr_fichier;
 		QAction *enr_fichier_sous;
@@ -81,7 +82,7 @@
 		
 		private:
 		QWorkspace workspace;
-		SchemaVue *schemaEnCours();
+		SchemaView *schemaInProgress();
 		QSignalMapper windowMapper;
 		/// Dock pour le Panel d'Appareils
 		QDockWidget *qdw_pa;
@@ -92,7 +93,7 @@
 		QAction *systray_masquer;
 		QAction * config_fullscreen;
 		QAction *systray_quitter;
-		QMenu *menu_fenetres;
+		QMenu *menu_windows;
 		/// Icone dans le systray
 		QSystemTrayIcon *qsti;
 		/// Geometrie de la fenetre principale
@@ -102,9 +103,9 @@
 		QToolBar *barre_outils;
 		
 		private slots:
-		void slot_couper();
+		void slot_cut();
 		void slot_copier();
-		void slot_coller();
+		void slot_paste();
 		void slot_zoomPlus();
 		void slot_zoomMoins();
 		void slot_zoomFit();

@@ -1,9 +1,9 @@
 #include "panelappareils.h"
-#include "contacteur.h"
+#include "contactor.h"
 #include "del.h"
 #include "entree.h"
 #include "elementperso.h"
-
+#include "debug.h"
 /**
 	Constructeur
 	@param parent Le QWidget parent du panel d'appareils
@@ -26,23 +26,23 @@ PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 	
 	// donnees
 	/*Element *del = new DEL(0,0);
-	Element *contacteur = new Contacteur(0,0);
+	Element *contacteur = new Contactor(0,0);
 	Element *entree = new Entree(0, 0);*/
 	
 	QListWidgetItem *qlwi;
-	QString whats_this = tr("Ceci est un \351l\351ment que vous pouvez ins\351rer dans votre sch\351ma par cliquer-d\351placer");
-	QString tool_tip = tr("Cliquer-d\351posez cet \351l\351ment sur le sch\351ma pour ins\351rer un \351l\351ment ");
+	QString whats_this = tr("This is a aliment that you can insert  into your diagram schema by clicking and dragging");
+	QString tool_tip = tr("Click - drop this aliment on the diagram \ 351ma to insert ");
 	
 	// remplissage de la liste
 	QDir dossier_elements("elements/");
 	QStringList filtres;
 	filtres << "*.elmt";
-	QStringList fichiers = dossier_elements.entryList(filtres, QDir::Files, QDir::Name);
-	foreach(QString fichier, fichiers) {
+	QStringList files = dossier_elements.entryList(filtres, QDir::Files, QDir::Name);
+	foreach(QString file, files) {
 		int etat;
-		ElementPerso *elmt_perso = new ElementPerso(fichier, 0, 0, &etat);
+		ElementPerso *elmt_perso = new ElementPerso(file, 0, 0, &etat);
 		if (etat != 0) {
-			qDebug() << "Le chargement du composant" << fichier << "a echoue avec le code d'erreur" << etat;
+			qDebug() << "Component loading" << file << "failed with error code" << etat;
 			continue;
 		}
 		qlwi = new QListWidgetItem(QIcon(elmt_perso -> pixmap()), elmt_perso -> nom(), this);
@@ -50,7 +50,7 @@ PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 		qlwi -> setToolTip(elmt_perso -> nom());
 		qlwi -> setWhatsThis(whats_this);
 		qlwi -> setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled);
-		qlwi -> setData(42, fichier);
+		qlwi -> setData(42, file);
 	}
 	
 	// force du noir sur une alternance de blanc (comme le schema) et de bleu clair
@@ -63,24 +63,26 @@ PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 }
 
 /**
-	Gere le mouvement lors d'un drag'n drop
+Manage movement during a drag'n drop
 */
 void PanelAppareils::dragMoveEvent(QDragMoveEvent */*e*/) {
 }
 
 /**
-	Gere le depot lors d'un drag'n drop
+	Manage the deposit during a drag'n drop
 */
 void PanelAppareils::dropEvent(QDropEvent */*e*/) {
 }
 
 /**
-	Gere le debut des drag'n drop
-	@param supportedActions Les actions supportees
-	@todo virer les lignes type «if ("tel appareil") construire TelAppareil» => trouver un moyen d'automatiser ca
+Manage the start of drag'n drop
+@param supportedActions Supported actions
+@todo transfer the lines like "if (" such device ") build TelAppareil" => find a way to automate this
  */
 void PanelAppareils::startDrag(Qt::DropActions /*supportedActions*/) {
 	// objet QDrag pour realiser le drag'n drop
+	//qDebug() << "foobar";
+
 	QDrag *drag = new QDrag(this);
 	
 	// donnees qui seront transmises par le drag'n drop
