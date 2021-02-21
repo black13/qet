@@ -162,12 +162,19 @@ void QETApp::closeEvent(QCloseEvent *) {
 	@todo gerer les eventuelles fermetures de files
 */
 void QETApp::quitter() {
-	if (!schemaInProgress()) qApp -> quit();
+	if (!schemaInProgress()) 
+	{ 
+		qApp->quit();
+	}
+		
 	else {
 		bool peut_quitter = true;
-		foreach(QWidget *fenetre, workspace.windowList()) {
-			if (qobject_cast<SchemaView *>(fenetre)) {
-				workspace.setActiveWindow(fenetre);
+		//foreach(QWidget *fenetre, workspace.subWindowList()) {
+		foreach(QMdiSubWindow * fenetre, workspace.subWindowList()) {
+
+			if (qobject_cast<SchemaView*>(fenetre->widget()))
+			{
+				workspace.setActiveSubWindow(fenetre);
 				if (!fermer()) {
 					peut_quitter = false;
 					break;
@@ -530,13 +537,14 @@ bool QETApp::open() {
 	
 	// verifie que le file n'est pas deja ouvert
 	QString chemin_fichier = QFileInfo(nom_fichier).canonicalFilePath();
-	foreach (QWidget *fenetre, workspace.windowList()) {
+
+	/*foreach (QWidget *fenetre, workspace.windowList()) {
 		SchemaView *fenetre_en_cours = qobject_cast<SchemaView *>(fenetre);
 		if (QFileInfo(fenetre_en_cours -> nom_fichier).canonicalFilePath() == chemin_fichier) {
 			workspace.setActiveWindow(fenetre);
 			return(false);
 		}
-	}
+	}*/
 	
 	// ouvre le file
 	SchemaView *sv = new SchemaView(this);
@@ -565,9 +573,11 @@ bool QETApp::open() {
 */
 bool QETApp::fermer() {
 	SchemaView *sv = schemaInProgress();
-	if (!sv) return(false);
+	if (!sv) 
+		return(false);
 	bool fermeture_schema = sv -> close();
-	if (fermeture_schema) delete sv;
+	if (fermeture_schema) 
+		delete sv;
 	return(fermeture_schema);
 }
 
@@ -575,8 +585,8 @@ bool QETApp::fermer() {
 	@return Le SchemaView qui a le focus dans l'interface MDI
 */
 SchemaView *QETApp::schemaInProgress() {
-	trace_msg("");
-	auto ret = qobject_cast<SchemaView *>(workspace.activeWindow());
+	QMdiSubWindow* activeSubWindow = workspace.activeSubWindow();
+	auto ret = activeSubWindow ? qobject_cast<SchemaView*>(activeSubWindow->widget()) : 0;
 	return ret;
 	//return(qobject_cast<SchemaView *>(workspace.activeWindow()));
 }
@@ -708,13 +718,15 @@ void QETApp::slot_updateActions() {
 
 void QETApp::addSchemaVue(SchemaView *sv) {
 	if (!sv) return;
-	SchemaView *s_v = schemaInProgress();
-	bool maximise = ((!s_v) || (s_v -> windowState() & Qt::WindowMaximized));
-	QWidget *p = workspace.addWindow(sv);
+	SchemaView* s_v = schemaInProgress();
+	bool maximise = ((!s_v) || (s_v->windowState() & Qt::WindowMaximized));
+	QWidget* p = workspace.addSubWindow/*addWindow*/(sv);
 	connect(sv, SIGNAL(selectionChanged()), this, SLOT(slot_updateActions()));
-	connect(sv, SIGNAL(modeChanged()),      this, SLOT(slot_updateActions()));
-	if (maximise) p -> showMaximized();
-	else p -> show();
+	connect(sv, SIGNAL(modeChanged()), this, SLOT(slot_updateActions()));
+	if (maximise)
+		p->showMaximized();
+	else
+		p->show();
 }
 
 void QETApp::slot_updateMenuFenetres() {
@@ -737,14 +749,19 @@ void QETApp::slot_updateMenuFenetres() {
 	menu_windows -> addAction(f_prec);
 	
 	// liste des windows
-	QList<QWidget *> windows = workspace.windowList();
-	if (!windows.isEmpty()) menu_windows -> addSeparator();
-	for (int i = 0 ; i < windows.size() ; ++ i) {
-		SchemaView *sv = qobject_cast<SchemaView *>(windows.at(i));
-		QAction *action  = menu_windows -> addAction(sv -> windowTitle().left(sv -> windowTitle().length()-3));
-		action -> setCheckable(true);
-		action -> setChecked(sv == schemaInProgress());
-		connect(action, SIGNAL(triggered()), &windowMapper, SLOT(map()));
-		windowMapper.setMapping(action, sv);
+	QList<QMdiSubWindow*> windows = workspace.subWindowList();
+	if (!windows.isEmpty()) 
+		menu_windows->addSeparator();
+	qDebug() << windows.size();
+	for (int i = 0; i < windows.size(); ++i) 
+	{
+		qDebug() << windows.at(i)->objectName();
+
+		SchemaView* sv = qobject_cast<SchemaView*>(windows.at(i));
+		QAction* action = menu_windows->addAction(sv->windowTitle().left(sv->windowTitle().length() - 3));
+		//action->setCheckable(true);
+		//action->setChecked(sv == schemaInProgress());
+		//connect(action, SIGNAL(triggered()), &windowMapper, SLOT(map()));
+		//windowMapper.setMapping(action, sv);
 	}
 }

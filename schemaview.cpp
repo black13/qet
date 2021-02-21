@@ -15,9 +15,8 @@ void SchemaView::initialise() {
 	setScene(scene = new Schema(this));
 	setDragMode(RubberBandDrag);
 	setAcceptDrops(true);
-	setWindowTitle(tr("Nouveau sch\351ma") + "[*]");
+	setWindowTitle(tr("New schema") + "[*]");
 	connect(scene, SIGNAL(selectionChanged()), this, SLOT(slot_selectionChanged()));
-	m_uuid = QUuid::createUuid();
 }
 
 /**

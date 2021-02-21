@@ -2,8 +2,8 @@
 	#define SCHEMA_H
 	#define GRILLE_X 10
 	#define GRILLE_Y 10
-	#include <QtGui>
-	#include <QtXml>
+	#include <QtWidgets>
+	#include <QtXml/QtXml>
     #include <QDebug>
     #include <QUuid>
 	class Element;

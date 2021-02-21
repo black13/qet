@@ -38,7 +38,7 @@ void DEL::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 	t.setWidthF(1.0);
 	p -> setPen(t);
 	
-	// a circle with a white background
+	// un cercle a fond blanc
 	p -> setBrush(QBrush(Qt::white, Qt::SolidPattern));
 	p -> drawEllipse(-10, 20, 20, 20);
 	p -> setBrush(Qt::NoBrush);

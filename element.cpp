@@ -7,7 +7,7 @@
 /**
 	Constructeur pour un element sans scene ni parent
 */
-Element::Element(QGraphicsItem *parent, Schema *scene) : QGraphicsItem(parent, scene) {
+Element::Element(QGraphicsItem *parent, Schema *scene) : QGraphicsItem(parent) {
 	sens = true;
 	peut_relier_ses_propres_bornes = false;
 }
@@ -103,7 +103,7 @@ QPixmap Element::pixmap() {
 */
 QVariant Element::itemChange(GraphicsItemChange change, const QVariant &value) {
 	if (change == QGraphicsItem::ItemPositionChange || change == QGraphicsItem::ItemSelectedChange) {
-		foreach(QGraphicsItem *qgi, children()) {
+		foreach(QGraphicsItem *qgi, childItems()) {
 			if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) p -> updateConducteur();
 		}
 	}
@@ -127,7 +127,16 @@ bool Element::invertOrientation() {
 	// on cache temporairement l'element pour eviter un bug graphique
 	hide();
 	// rotation en consequence et rafraichissement de l'element graphique
-	rotate(sens ? 90.0 : -90.0);
+	if (sens)
+	{
+		setTransform(QTransform().rotate(90.0), true);
+	}
+	else
+	{
+		setTransform(QTransform().rotate(-90.0), true);
+	}
+	
+	//rotate(sens ? 90.0 : -90.0);
 	// on raffiche l'element, on le reselectionne et on le rafraichit
 	show();
 	select();
@@ -213,7 +222,7 @@ void Element::setPos(const QPointF &p) {
 		QGraphicsItem::setPos(p_x, p_y);
 	} else QGraphicsItem::setPos(p);
 	// actualise les bornes / conducteurs
-	foreach(QGraphicsItem *qgi, children()) {
+	foreach(QGraphicsItem *qgi, childItems()) {
 		if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) p -> updateConducteur();
 	}
 }

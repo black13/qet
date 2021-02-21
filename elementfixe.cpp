@@ -48,7 +48,7 @@ bool ElementFixe::fromXml(QDomElement &e, QHash<int, Terminal *> &table_id_adr) 
 	
 	QHash<int, Terminal *> priv_id_adr;
 	int bornes_non_trouvees = 0;
-	foreach(QGraphicsItem *qgi, children()) {
+	foreach(QGraphicsItem *qgi, childItems()) {
 		if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) {
 			bool borne_trouvee = false;
 			foreach(QDomElement qde, liste_bornes) {

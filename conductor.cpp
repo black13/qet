@@ -9,8 +9,8 @@
 	@param parent Element parent du conducteur (0 par defaut)
 	@param scene  QGraphicsScene auquelle appartient le conducteur
 */
-Conductor::Conductor(Terminal *p1, Terminal* p2, Element *parent, QGraphicsScene *scene) : QGraphicsPathItem(parent, scene) {
-	// bornes que le conducteur relie
+Conductor::Conductor(Terminal *p1, Terminal* p2, Element *parent, QGraphicsScene *scene) : QGraphicsPathItem(parent) {
+	// bornes que le conductor relie
 	borne1 = p1;
 	borne2 = p2;
 	// ajout du conducteur a la liste de conducteurs de chacune des deux bornes
@@ -180,7 +180,7 @@ void Conductor::destroy() {
 */
 bool Conductor::valideXml(QDomElement &e){
 	// verifie le nom du tag
-	if (e.tagName() != "conducteur") return(false);
+	if (e.tagName() != "conductor") return(false);
 	
 	// verifie la presence des attributs minimaux
 	if (!e.hasAttribute("borne1")) return(false);
