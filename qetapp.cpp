@@ -95,8 +95,9 @@ QETApp::QETApp(QWidget *parent) : QMainWindow(parent) {
 	// la fenetre est maximisee par defaut
 	setMinimumWidth(500);
 	setMinimumHeight(350);
-	setWindowState(Qt::WindowMaximized);
+	//setWindowState(Qt::WindowMaximized);
 	
+	resize(500, 500);
 	// connexions signaux / slots pour une interface sensee
 	connect(&workspace, SIGNAL(windowActivated(QWidget *)), this, SLOT(slot_updateActions()));
 	connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(slot_updateActions()));
@@ -751,8 +752,10 @@ void QETApp::slot_updateMenuFenetres() {
 	// liste des windows
 	QList<QMdiSubWindow*> windows = workspace.subWindowList();
 	if (!windows.isEmpty()) 
+	{
 		menu_windows->addSeparator();
-	qDebug() << windows.size();
+	}
+	
 	for (int i = 0; i < windows.size(); ++i) 
 	{
 		QMdiSubWindow* window = windows.at(i);

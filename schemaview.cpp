@@ -353,8 +353,8 @@ void SchemaView::closeEvent(QCloseEvent *event) {
 	// demande d'abord a l'utilisateur s'il veut enregistrer le schema en cours
 	QMessageBox::StandardButton reponse = QMessageBox::question(
 		this,
-		tr("Enregistrer le sch\351ma en cours ?"),
-		tr("Voulez-vous enregistrer le sch\351ma en cours ?"),
+		tr("Save the current schema?"),
+		tr("Do you want to save the current schema ?"),
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 		QMessageBox::Cancel
 	);
