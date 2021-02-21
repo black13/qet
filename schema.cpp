@@ -23,9 +23,9 @@ Schema::Schema(QObject *parent) : QGraphicsScene(parent) {
 }
 
 /**
-Draw the background of the diagram, ie the grid.
-@param p The QPainter to use for drawing
-@param r The rectangle of the area to be drawn
+	Dessine l'arriere-plan du schema, cad la grille.
+	@param p Le QPainter a utiliser pour dessiner
+	@param r Le rectangle de la zone a dessiner
 */
 void Schema::drawBackground(QPainter *p, const QRectF &r) {
 	p -> save();
@@ -117,7 +117,7 @@ QDomDocument Schema::toXml(bool schema) {
 	QList<Conductor *> liste_conducteurs;
 	
 	
-	// Determine les elements a ? XMLiser ?
+	// Determine les elements a « XMLiser »
 	foreach(QGraphicsItem *qgi, items()) {
 		if (Element *elmt = qgraphicsitem_cast<Element *>(qgi)) {
 			if (schema) liste_elements << elmt;
@@ -206,7 +206,7 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 	// si la racine n'a pas d'enfant : le chargement est fini (schema vide)
 	if (racine.firstChild().isNull()) return(true);
 	
-	// chargement de tous les Elements du file XML
+	// chargement de tous les Elements du fichier XML
 	QList<Element *> elements_ajoutes;
 	//uint nb_elements = 0;
 	QHash< int, Terminal *> table_adr_id;
@@ -254,7 +254,7 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 		}
 	}
 	
-	// chargement de tous les Conducteurs du file XML
+	// chargement de tous les Conducteurs du fichier XML
 	for (QDomNode node = racine.firstChild() ; !node.isNull() ; node = node.nextSibling()) {
 		// on s'interesse a l'element XML "conducteurs" (= groupe de conducteurs)
 		QDomElement conducteurs = node.toElement();
@@ -264,11 +264,11 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 			// on s'interesse a l'element XML "element" (elements eux-memes)
 			QDomElement f = n.toElement();
 			if (f.isNull() || !Conductor::valideXml(f)) continue;
-			// verifie que les bornes que le conducteur relie sont connues
+			// verifie que les bornes que le conductor relie sont connues
 			int id_p1 = f.attribute("borne1").toInt();
 			int id_p2 = f.attribute("borne2").toInt();
 			if (table_adr_id.contains(id_p1) && table_adr_id.contains(id_p2)) {
-				// pose le conducteur... si c'est possible
+				// pose le conductor... si c'est possible
 				Terminal *p1 = table_adr_id.value(id_p1);
 				Terminal *p2 = table_adr_id.value(id_p2);
 				if (p1 != p2) {
@@ -277,7 +277,7 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 					if (!cia) foreach(QGraphicsItem *item, p2 -> parentItem() -> childItems()) if (item == p1) peut_poser_conducteur = false;
 					if (peut_poser_conducteur) new Conductor(table_adr_id.value(id_p1), table_adr_id.value(id_p2), 0, this);
 				}
-			} else qDebug() << "Le chargement du conducteur" << id_p1 << id_p2 << "a echoue";
+			} else qDebug() << "Le chargement du conductor" << id_p1 << id_p2 << "a echoue";
 		}
 	}
 	return(true);
@@ -290,7 +290,7 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 	@return true si l'ajout a parfaitement reussi, false sinon 
 */
 Element *Schema::elementFromXml(QDomElement &e, QHash<int, Terminal *> &table_id_adr) {
-	// cree un element dont le type correspond à l'id type
+	// cree un element dont le type correspond ? l'id type
 	QString type = e.attribute("type");
 	int etat;
 	Element *nvel_elmt = new ElementPerso(type, 0, 0, &etat);

@@ -755,13 +755,13 @@ void QETApp::slot_updateMenuFenetres() {
 	qDebug() << windows.size();
 	for (int i = 0; i < windows.size(); ++i) 
 	{
-		qDebug() << windows.at(i)->objectName();
-
-		SchemaView* sv = qobject_cast<SchemaView*>(windows.at(i));
+		QMdiSubWindow* window = windows.at(i);
+		qDebug() << window->widget()->windowTitle();
+		SchemaView* sv = qobject_cast<SchemaView*>(window->widget());
 		QAction* action = menu_windows->addAction(sv->windowTitle().left(sv->windowTitle().length() - 3));
-		//action->setCheckable(true);
-		//action->setChecked(sv == schemaInProgress());
-		//connect(action, SIGNAL(triggered()), &windowMapper, SLOT(map()));
+		action->setCheckable(true);
+		action->setChecked(sv == schemaInProgress());
+		connect(action, SIGNAL(triggered()), &windowMapper, SLOT(map()));
 		//windowMapper.setMapping(action, sv);
 	}
 }
