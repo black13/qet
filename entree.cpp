@@ -5,7 +5,7 @@
 	@param parent Le QObject parent de l'element.
 	@param scene  La scene sur laquelle l'element est affiche
 */
-Entree::Entree(QGraphicsItem *parent, Schema *scene) : ElementFixe(parent, scene) {
+Entree::Entree(QGraphicsItem *parent, Schema *scene) : FixedElement(parent, scene) {
 	// taille et hotspot
 	setSize(20, 40);
 	setHotspot(QPoint(10, 15));
