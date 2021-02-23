@@ -5,9 +5,9 @@
 #include "debug.h"
 
 /**
-	Fonction principale du programme QElectroTech
-	@param argc nombre de parametres
-	@param argv parametres
+Main function of the QElectroTech program
+@param argc number of parameters
+@param argv parameters
 */
 int main(int argc, char **argv) {
 	// Creation de l'application
@@ -16,12 +16,13 @@ int main(int argc, char **argv) {
 	trace_msg("");
 
 
-	// Traducteur
+
+	// Translator
 	QTranslator trad;
 	//trad.load("qet_en");
 	app.installTranslator(&trad);
-	// Creation et affichage du QETApp : QElectroTechApplication
+	// Creation and display of the QETApp: QElectroTechApplication
 	(new QETApp()) -> show();
-	// Execution de l'application
+	// Execution of the application
 	return(app.exec());
 }
