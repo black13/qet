@@ -126,7 +126,7 @@ QDomDocument Schema::toXml(bool schema) {
 			if (schema) liste_conducteurs << f;
 			// lorsqu'on n'exporte pas tout le schema, il faut retirer les conducteurs non selectionnes
 			// et pour l'instant, les conducteurs non selectionnes sont les conducteurs dont un des elements n'est pas relie
-			else if (f -> borne1 -> parentItem() -> isSelected() && f -> borne2 -> parentItem() -> isSelected()) liste_conducteurs << f;
+			else if (f -> terminal1 -> parentItem() -> isSelected() && f -> terminal2 -> parentItem() -> isSelected()) liste_conducteurs << f;
 		}
 	}
 	
@@ -174,8 +174,8 @@ QDomDocument Schema::toXml(bool schema) {
 	QDomElement conducteurs = document.createElement("conducteurs");
 	foreach(Conductor *f, liste_conducteurs) {
 		QDomElement conductor = document.createElement("conductor");
-		conductor.setAttribute("borne1", table_adr_id.value(f -> borne1));
-		conductor.setAttribute("borne2", table_adr_id.value(f -> borne2));
+		conductor.setAttribute("terminal1", table_adr_id.value(f -> terminal1));
+		conductor.setAttribute("terminal2", table_adr_id.value(f -> terminal2));
 		conducteurs.appendChild(conductor);
 	}
 	racine.appendChild(conducteurs);
@@ -265,8 +265,8 @@ bool Schema::fromXml(QDomDocument &document, QPointF position) {
 			QDomElement f = n.toElement();
 			if (f.isNull() || !Conductor::valideXml(f)) continue;
 			// verifie que les bornes que le conductor relie sont connues
-			int id_p1 = f.attribute("borne1").toInt();
-			int id_p2 = f.attribute("borne2").toInt();
+			int id_p1 = f.attribute("terminal1").toInt();
+			int id_p2 = f.attribute("terminal2").toInt();
 			if (table_adr_id.contains(id_p1) && table_adr_id.contains(id_p2)) {
 				// pose le conductor... si c'est possible
 				Terminal *p1 = table_adr_id.value(id_p1);
