@@ -12,10 +12,10 @@
 	*/
 	class Terminal : public QGraphicsItem {
 		public:
-		// enum definissant l'orientation de la borne
+		// enum defining the orientation of the terminal
 		enum Orientation {Nord, Sud, Est, Ouest};
 		
-		// permet de caster un QGraphicsItem en Terminal avec qgraphicsitem_cast
+		// allows to cast a QGraphicsItem in Terminal with qgraphicsitem_cast
 		enum { Type = UserType + 1002 };
     	virtual int type() const { return Type; }
 		
@@ -42,12 +42,12 @@
 		inline QPointF amarrageConducteur() const { return(mapToScene(amarrage_conducteur)); }
 		void updateConducteur();
 		
-		// methodes relatives a l'import/export au format XML
+		// methods relating to import / export in XML format
 		static bool valideXml(QDomElement  &);
 		bool        fromXml  (QDomElement  &);
 		QDomElement toXml    (QDomDocument &);
 		
-		// methodes de gestion des evenements
+		// event management methods
 		void hoverEnterEvent  (QGraphicsSceneHoverEvent *);
 		void hoverMoveEvent   (QGraphicsSceneHoverEvent *);
 		void hoverLeaveEvent  (QGraphicsSceneHoverEvent *);
@@ -67,7 +67,7 @@
 		QList<Conductor *> liste_conducteurs;
 		// pointeur vers un rectangle correspondant au bounding rect ; permet de ne calculer le bounding rect qu'une seule fois ; le pointeur c'est parce que le compilo exige une methode const
 		QRectF *br;
-		Terminal *borne_precedente;
+		Terminal *terminal_precedente;
 		bool hovered;
 		// methode initialisant les differents membres de la borne
 		void initialise(QPointF, Terminal::Orientation);
