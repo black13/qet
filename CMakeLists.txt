@@ -40,7 +40,7 @@ qetapp.cpp
 schemaview.cpp
 conductor.cpp
 del.cpp
-elementfixe.cpp
+FixedElement.cpp
 entree.cpp
 panelappareils.cpp
 schema.cpp
