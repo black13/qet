@@ -2,10 +2,10 @@
 	#define DEL_H
 	#include "elementfixe.h"
 	/**
-		Cette classe herite de la classe Element Fixe pour definir une
-		Diode ElectroLuminescente
+	This class inherits from the Fixed Element class to define a
+	Light emitting diode
 	*/
-	class DEL : public ElementFixe {
+	class DEL : public FixedElement {
 		public:
 		DEL(QGraphicsItem * = 0, Schema * = 0);
 		virtual int nbBornes() const;
