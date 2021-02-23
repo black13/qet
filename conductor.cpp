@@ -1,22 +1,23 @@
 #include <QtDebug>
 #include "conductor.h"
 #include "element.h"
-
+#include "debug.h"
 /**
-	Constructeur
-	@param p1     Premiere Terminal auquel le conducteur est lie
-	@param p2     Seconde Terminal auquel le conducteur est lie
-	@param parent Element parent du conducteur (0 par defaut)
-	@param scene  QGraphicsScene auquelle appartient le conducteur
+Builder
+@param p1 First Terminal to which the driver is linked
+@param p2 Second Terminal to which the driver is linked
+@param parent Parent element of the driver (0 by default)
+@param scene QGraphicsScene to which the conductor belongs
 */
 Conductor::Conductor(Terminal *p1, Terminal* p2, Element *parent, QGraphicsScene *scene) : QGraphicsPathItem(parent) {
-	// bornes que le conductor relie
-	borne1 = p1;
-	borne2 = p2;
-	// ajout du conducteur a la liste de conducteurs de chacune des deux bornes
-	bool ajout_p1 = borne1 -> addConducteur(this);
-	bool ajout_p2 = borne2 -> addConducteur(this);
-	// en cas d'echec de l'ajout (conducteur deja existant notamment)
+	trace_msg("");
+	// terminals that the conductor connects
+	terminal1 = p1;
+	terminal2 = p2;
+	// add the conductor to the list of conductors for each of the two terminals
+	bool ajout_p1 = terminal1 -> addConducteur(this);
+	bool ajout_p2 = terminal2 -> addConducteur(this);
+	// in case of failure of the addition (driver already existing in particular)
 	if (!ajout_p1 || !ajout_p2) return;
 	destroyed = false;
 	// le conducteur est represente par un trait fin
@@ -24,27 +25,24 @@ Conductor::Conductor(Terminal *p1, Terminal* p2, Element *parent, QGraphicsScene
 	t.setWidthF(1.0);
 	setPen(t);
 	// calcul du rendu du conducteur
-	calculeConducteur();
+	calculateConductor();
 }
 
 /**
-	Met a jour la representation graphique du conducteur.
-	@param rect Rectangle a mettre a jour
+	Updates the graphical representation of the driver.
+	@param rect Rectangle to update
 */
 void Conductor::update(const QRectF &rect = QRectF()) {
-	calculeConducteur();
+	calculateConductor();
 	QGraphicsPathItem::update(rect);
 }
 
 /**
-	Met a jour la representation graphique du conducteur.
-	@param x      abscisse  du rectangle a mettre a jour
-	@param y      ordonnee du rectangle a mettre a jour
-	@param width  longueur du rectangle a mettre a jour
-	@param height hauteur du rectangle a mettre a jour
+	Destroyer of the Conductor. Before being destroyed, the conductor unhooks from the terminals
+	to which it is linked.
 */
 void Conductor::update(qreal x, qreal y, qreal width, qreal height) {
-	calculeConducteur();
+	calculateConductor();
 	QGraphicsPathItem::update(x, y, width, height);
 }
 
@@ -57,14 +55,14 @@ void Conductor::update(qreal x, qreal y, qreal width, qreal height) {
 }*/
 
 /**
-	Met a jour le QPainterPath constituant le conducteur pour obtenir
-	un conducteur uniquement compose de droites reliant les deux bornes.
+Updates the QPainterPath constituting the conductor to obtain
+a conductor only consists of straight lines connecting the two terminals.
 */
-void Conductor::calculeConducteur() {
+void Conductor::calculateConductor() {
 	QPainterPath t;
-	
-	QPointF p1 = borne1 -> amarrageConducteur();
-	QPointF p2 = borne2 -> amarrageConducteur();
+	trace_msg("");
+	QPointF p1 = terminal1 -> amarrageConducteur();
+	QPointF p2 = terminal2 -> amarrageConducteur();
 	
 	QPointF depart, arrivee;
 	Terminal::Orientation ori_depart, ori_arrivee;
@@ -72,13 +70,13 @@ void Conductor::calculeConducteur() {
 	if (p1.x() <= p2.x()) {
 		depart      = mapFromScene(p1);
 		arrivee     = mapFromScene(p2);
-		ori_depart  = borne1 -> orientation();
-		ori_arrivee = borne2 -> orientation();
+		ori_depart  = terminal1 -> orientation();
+		ori_arrivee = terminal2 -> orientation();
 	} else {
 		depart      = mapFromScene(p2);
 		arrivee     = mapFromScene(p1);
-		ori_depart  = borne2 -> orientation();
-		ori_arrivee = borne1 -> orientation();
+		ori_depart  = terminal2 -> orientation();
+		ori_arrivee = terminal1 -> orientation();
 	}
 	
 	// debut du trajet
@@ -120,10 +118,11 @@ void Conductor::calculeConducteur() {
 }
 
 /**
-	Dessine le conducteur sans antialiasing.
-	@param qp Le QPainter a utiliser pour dessiner le conducteur
-	@param qsogi Les options de style pour le conducteur
-	@param qw Le QWidget sur lequel on dessine 
+
+Draw the driver without antialiasing.
+@param qp The QPainter to use to draw the conductor
+@param qsogi Style options for the driver
+@param qw The QWidget on which we draw
 */
 void Conductor::paint(QPainter *qp, const QStyleOptionGraphicsItem *qsogi, QWidget *qw) {
 	qp -> save();
@@ -135,10 +134,10 @@ void Conductor::paint(QPainter *qp, const QStyleOptionGraphicsItem *qsogi, QWidg
 }
 
 /**
-	Indique si deux orientations de Terminal sont sur le meme axe (Vertical / Horizontal).
-	@param a La premiere orientation de Terminal
-	@param b La seconde orientation de Terminal
-	@return Un booleen a true si les deux orientations de bornes sont sur le meme axe
+Indicates whether two Terminal orientations are on the same axis (Vertical / Horizontal).
+@param a Terminal's first orientation
+@param b The second orientation of Terminal
+@return A boolean is true if both terminal orientations are on the same axis
 */
 bool Conductor::surLeMemeAxe(Terminal::Orientation a, Terminal::Orientation b) {
 	if ((a == Terminal::Nord || a == Terminal::Sud) && (b == Terminal::Nord || b == Terminal::Sud)) return(true);
@@ -147,18 +146,18 @@ bool Conductor::surLeMemeAxe(Terminal::Orientation a, Terminal::Orientation b) {
 }
 
 /**
-	Indique si une orientation de borne est horizontale (Est / Ouest).
-	@param a L'orientation de borne
-	@return True si l'orientation de borne est horizontale, false sinon
+Indicates whether a terminal orientation is horizontal (East / West).
+@param a Terminal orientation
+@return True if the terminal orientation is horizontal, false otherwise
 */
 bool Conductor::estHorizontale(Terminal::Orientation a) {
 	return(a == Terminal::Est || a == Terminal::Ouest);
 }
 
 /**
-	Indique si une orientation de borne est verticale (Nord / Sud).
-	@param a L'orientation de borne
-	@return True si l'orientation de borne est verticale, false sinon
+Indicates whether a terminal orientation is vertical (North / South).
+@param a Terminal orientation
+@return True if the terminal orientation is vertical, false otherwise
 */
 bool Conductor::estVerticale(Terminal::Orientation a) {
 	return(a == Terminal::Nord || a == Terminal::Sud);
@@ -169,8 +168,8 @@ bool Conductor::estVerticale(Terminal::Orientation a) {
 */
 void Conductor::destroy() {
 	destroyed = true;
-	borne1 -> removeConducteur(this);
-	borne2 -> removeConducteur(this);
+	terminal1 -> removeConducteur(this);
+	terminal2 -> removeConducteur(this);
 }
 
 /**
@@ -183,16 +182,16 @@ bool Conductor::valideXml(QDomElement &e){
 	if (e.tagName() != "conductor") return(false);
 	
 	// verifie la presence des attributs minimaux
-	if (!e.hasAttribute("borne1")) return(false);
-	if (!e.hasAttribute("borne2")) return(false);
+	if (!e.hasAttribute("terminal1")) return(false);
+	if (!e.hasAttribute("terminal2")) return(false);
 	
 	bool conv_ok;
 	// parse l'abscisse
-	e.attribute("borne1").toInt(&conv_ok);
+	e.attribute("terminal1").toInt(&conv_ok);
 	if (!conv_ok) return(false);
 	
 	// parse l'ordonnee
-	e.attribute("borne2").toInt(&conv_ok);
+	e.attribute("terminal2").toInt(&conv_ok);
 	if (!conv_ok) return(false);
 	return(true);
 }

@@ -4,7 +4,7 @@
 	#include "terminal.h"
 	class Element;
 	/**
-		Cette classe represente un conducteur. Un conducteur relie deux bornes d'element.
+		This class represents a driver. A conductor connects two element terminals.
 	*/
 	class Conductor : public QGraphicsPathItem {
 		public:
@@ -20,15 +20,15 @@
 		void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
 		static bool valideXml(QDomElement &);
 		
-		///Premiere borne a laquelle le fil est rattache
-		Terminal *borne1;
-		///Deuxieme borne a laquelle le fil est rattache
-		Terminal *borne2;
+		/// First terminal to which the wire is attached
+		Terminal *terminal1;
+		/// Second terminal to which the wire is attached
+		Terminal *terminal2;
 		private:
-		/// booleen indiquant si le fil est encore valide
+		/// booleen indicating if the thread is still valid
 		bool destroyed;
 		
-		void calculeConducteur();
+		void calculateConductor();
 		bool surLeMemeAxe(Terminal::Orientation, Terminal::Orientation);
 		bool estHorizontale(Terminal::Orientation a);
 		bool estVerticale(Terminal::Orientation a);
