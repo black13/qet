@@ -242,7 +242,7 @@ void Element::setPos(qreal x, qreal y) {
 */
 void Element::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
 
-	trace_msg("mousemovevent");
+	trace_msg("");
 	//int ret = _CrtDbgReportW(_CRT_ERROR, _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(QT_VERSION_STR), reinterpret_cast<const wchar_t *> (QString::fromLatin1("video/").utf16()));
 	
 	/*&& (flags() & ItemIsMovable)*/ // on le sait qu'il est movable
