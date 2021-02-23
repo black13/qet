@@ -65,7 +65,7 @@ PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 /**
 Manage movement during a drag'n drop
 */
-void PanelAppareils::dragMoveEvent(QDragMoveEvent */*e*/) {
+void PanelAppareils::dragMoveEvent(QDragMoveEvent *) {
 }
 
 /**
