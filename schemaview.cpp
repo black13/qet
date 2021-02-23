@@ -304,10 +304,14 @@ void SchemaView::mousePressEvent(QMouseEvent *e) {
 }
 
 /**
-	Ouvre un file *.qet dans cette SchemaView
-	@param nom_fichier Nom du file a open
-	@param erreur Si le pointeur est specifie, cet entier est mis a 0 en cas de reussite de l'ouverture, 1 si le file n'existe pas, 2 si le file n'est pas lisible, 3 si le file n'est pas un element XML, 4 si l'ouverture du file a echoue pour une autre raison (c'est pas ca qui manque ^^)
-	@return true si l'ouverture a reussi, false sinon
+Open a * .qet file in this SchemaView
+@param filename Name of the file a open
+@param error If the pointer is specified, this integer is set to 0 if the opening is successful,
+1 if the queue does not exist,
+2 if the file is not readable,
+3 if the file is not an XML element,
+4 if the opening of the file failed for another reason (that's not what's missing ^^)
+@return true if the opening was successful, false otherwise
 */
 bool SchemaView::open(QString n_fichier, int *erreur) {
 	// verifie l'existence du file
@@ -379,13 +383,14 @@ bool SchemaView::enregistrer() {
 }
 
 /**
-	Cette methode demande un nom de file a l'utilisateur pour enregistrer le schema
-	Si aucun nom n'est entre, elle renvoie faux.
-	Si le nom ne se termine pas par l'extension .qet, celle-ci est ajoutee.
-	Si l'enregistrement reussit, le nom du file est conserve et la fonction renvoie true.
-	Sinon, faux est renvoye.
-	@return true si l'enregistrement a reussi, false sinon
-	@todo detecter le chemin du bureau automatiquement
+
+This method asks the user for a queue name to save the schema
+If no name is entered, it returns false.
+If the name does not end with the .qet extension, it is added.
+If the save is successful, the name of the file is kept and the function returns true.
+Otherwise, false is returned.
+@return true if the registration was successful, false otherwise
+@todo detect the desktop path automatically
 */
 bool SchemaView::enregistrer_sous() {
 	// demande un nom de file a l'utilisateur pour enregistrer le schema
@@ -395,7 +400,7 @@ bool SchemaView::enregistrer_sous() {
 		QDir::homePath(),
 		tr("Schema QelectroTech (*.qet)")
 	);
-	// si aucun nom n'est entre, renvoie faux.
+	// if no name is entered, return false.
 	if (n_fichier == "") return(false);
 	// si le nom ne se termine pas par l'extension .qet, celle-ci est ajoutee
 	if (!n_fichier.endsWith(".qet", Qt::CaseInsensitive)) n_fichier += ".qet";
@@ -411,11 +416,11 @@ bool SchemaView::enregistrer_sous() {
 }
 
 /**
-	Methode privee gerant l'enregistrement du file XML. S'il n'est pas possible
-	d'ecrire dans le file, cette fonction affiche un message d'erreur et renvoie false.
-	Autrement, elle renvoie true.
-	@param nom_fichier Nom du file dans lequel l'arbre XML doit etre ecrit
-	@return true si l'enregistrement a reussi, false sinon
+Private method managing the recording of the XML file. If it is not possible
+to write to the file, this function displays an error message and returns false.
+Otherwise, it returns true.
+@param filename Name of the file in which the XML tree must be written
+@return true if the registration was successful, false otherwise
 */
 bool SchemaView::private_enregistrer(QString &n_fichier) {
 	QFile file(n_fichier);
