@@ -46,7 +46,7 @@ QETApp::QETApp(QWidget *parent) : QMainWindow(parent) {
 	}
 	
 	
-	// ajout de tous les SchemaView necessaires
+	// add all the necessary SchemaView
 	foreach (SchemaView *sv, schema_vues) 
 	{
 		qDebug() << sv->m_uuid.toString().toUpper().toLatin1().constData();
@@ -63,8 +63,8 @@ QETApp::QETApp(QWidget *parent) : QMainWindow(parent) {
 	// barre de statut de la fenetre
 	statusBar() -> showMessage(tr("QElectrotech"));
 	
-	// ajout du panel d'Appareils en tant que QDockWidget
-	qdw_pa = new QDockWidget(tr("Panel d'appareils"), this);
+	// add the Devices panel as QDockWidget
+	qdw_pa = new QDockWidget(tr("Device panel"), this);
 	qdw_pa -> setAllowedAreas(Qt::AllDockWidgetAreas);
 	qdw_pa -> setFeatures(QDockWidget::AllDockWidgetFeatures);
 	qdw_pa -> setMinimumWidth(160);
@@ -222,14 +222,14 @@ void QETApp::aPropos() {
 void QETApp::actions() {
 	// icones et labels
 	nouveau_fichier   = new QAction(QIcon(":/ico/new.png"),        tr("&Nouveau"),                       this);
-	open_fichier    = new QAction(QIcon(":/ico/open.png"),       tr("&open"),                        this);
+	open_fichier    = new QAction(QIcon(":/ico/open.png"),         tr("&open"),                          this);
 	fermer_fichier    = new QAction(QIcon(":/ico/fileclose.png"),  tr("&Fermer"),                        this);
 	enr_fichier       = new QAction(QIcon(":/ico/save.png"),       tr("&Enregistrer"),                   this);
 	enr_fichier_sous  = new QAction(QIcon(":/ico/saveas.png"),     tr("Enregistrer sous"),               this);
 	importer          = new QAction(QIcon(":/ico/import.png"),     tr("&Importer"),                      this);
 	exporter          = new QAction(QIcon(":/ico/export.png"),     tr("E&xporter"),                      this);
 	imprimer          = new QAction(QIcon(":/ico/print.png"),      tr("Imprimer"),                       this);
-	quitter_qet       = new QAction(QIcon(":/ico/exit.png"),       tr("&Exit"),                       this);
+	quitter_qet       = new QAction(QIcon(":/ico/exit.png"),       tr("&Exit"),                          this);
 	
 	annuler           = new QAction(QIcon(":/ico/undo.png"),       tr("Annu&ler"),                       this);
 	refaire           = new QAction(QIcon(":/ico/redo.png"),       tr("Re&faire"),                       this);
@@ -359,12 +359,12 @@ void QETApp::actions() {
 */
 void QETApp::menus() {
 	QMenu *menu_fichier   = menuBar() -> addMenu(tr("&File"));
-	QMenu *menu_edition   = menuBar() -> addMenu(tr("&\311dition"));
-	QMenu *menu_affichage = menuBar() -> addMenu(tr("Afficha&ge"));
+	QMenu *menu_edition   = menuBar() -> addMenu(tr("&Addition"));
+	QMenu *menu_affichage = menuBar() -> addMenu(tr("&Display"));
 	QMenu *menu_outils    = menuBar() -> addMenu(tr("O&utils"));
 	QMenu *menu_config    = menuBar() -> addMenu(tr("&Configuration"));
-	menu_windows         = menuBar() -> addMenu(tr("Fe&n\352tres"));
-	QMenu *menu_aide      = menuBar() -> addMenu(tr("&Aide"));
+	menu_windows         = menuBar() -> addMenu(tr("&Window"));
+	QMenu *menu_aide      = menuBar() -> addMenu(tr("&Help"));
 	
 	// tear off feature rulezz... pas ^^ mais bon...
 	menu_fichier   -> setTearOffEnabled(true);
@@ -489,9 +489,9 @@ void QETApp::dialogue_exporter() {
 }
 
 /**
-	Methode enregistrant le schema dans le dernier nom de file connu.
-	Si aucun nom de file n'est connu, cette methode appelle la methode enregistrer_sous
-	@return true si l'enregistrement a reussi, false sinon
+Method saving the schema in the last known queue name.
+If no queue name is known, this method calls the save_as method
+@return true if the registration was successful, false otherwise
 */
 bool QETApp::enregistrer() {
 	if (!schemaInProgress()) return(false);
