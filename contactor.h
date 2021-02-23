@@ -2,10 +2,10 @@
 	#define CONTACTEUR_H
 	#include "elementfixe.h"
 	/**
-		Cette classe herite de la classe Element Fixe pour definir un
-		contacteur
+	This class inherits from the Fixed Element class to define a
+	contactor
 	*/
-	class Contactor : public ElementFixe {
+	class Contactor : public FixedElement {
 		public:
 		Contactor(QGraphicsItem * = 0, Schema * = 0);
 		virtual int nbBornes() const;
