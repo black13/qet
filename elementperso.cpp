@@ -1,6 +1,6 @@
 #include "elementperso.h"
 
-ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, int *etat) : ElementFixe(qgi, s) {
+ElementPerso::ElementPerso(QString &nom_fichier, QGraphicsItem *qgi, Schema *s, int *etat) : FixedElement(qgi, s) {
 	nomfichier = nom_fichier;
 	nb_bornes = 0;
 	// pessimisme inside : par defaut, ca foire

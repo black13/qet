@@ -2,7 +2,7 @@
 	#define ELEMENTPERSO_H
 	#include "elementfixe.h"
 	#include <QtGui>
-	class ElementPerso : public ElementFixe {
+	class ElementPerso : public FixedElement {
 		public:
 		ElementPerso(QString &, QGraphicsItem * = 0, Schema * = 0, int * = NULL);
 		virtual int nbBornes() const;
