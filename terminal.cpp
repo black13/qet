@@ -202,7 +202,7 @@ QRectF Terminal::boundingRect() const
 }
 
 /**
-	Gere l'entree de la souris sur la zone de la Terminal.
+ Manages the entry of the mouse on the area of ??the Terminal.
 */
 void Terminal::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
 	hovered = true;
@@ -210,13 +210,13 @@ void Terminal::hoverEnterEvent(QGraphicsSceneHoverEvent *) {
 }
 
 /**
-	Gere les mouvements de la souris sur la zone de la Terminal.
+ Manages mouse movements on the Terminal area.
 */
 void Terminal::hoverMoveEvent(QGraphicsSceneHoverEvent *) {
 }
 
 /**
-	Gere le fait que la souris sorte de la zone de la Terminal.
+ Handles the fact that the mouse goes out of the Kiosk area.
 */
 void Terminal::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
 	hovered = false;
@@ -224,7 +224,7 @@ void Terminal::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {
 }
 
 /**
-	Gere le fait qu'on enfonce un bouton de la souris sur la Terminal.
+ Handles the fact that a mouse button is pressed on the Terminal.
 	@param e L'evenement souris correspondant
 */
 void Terminal::mousePressEvent(QGraphicsSceneMouseEvent *e) {
@@ -267,24 +267,24 @@ void Terminal::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
 	*/
 	Q_ASSERT_X(!(qgis.isEmpty()), "Terminal::mouseMoveEvent", "The list of items should not be empty");
 	
-	// s'il y a autre chose que le poseur de conducteur dans la liste
+	// if there is something other than the driver setter in the list
 	if (qgis.size() > 1) {
-		// on prend le deuxieme element de la liste
+		// we take the second element of the list
 		QGraphicsItem *qgi = qgis.at(1);
-		// si le qgi est une borne...
+		// if the qgi is a bound ...
 		if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) {
-			// ...on lui applique l'effet hover approprie
+		// we apply the appropriate hover effect
 			if (p == this) {
-				// effet si l'on hover sur la borne de depart
+			// effect if we hover on the starting terminal
 				couleur_hovered = couleur_interdit;
 			} else if (p -> parentItem() == parentItem()) {
-				// effet si l'on hover sur une borne du meme appareil
+			// effect if we hover on a terminal of the same device
 				if (((Element *)parentItem()) -> connexionsInternesAcceptees())
 					p -> couleur_hovered = p -> couleur_autorise;
 				else p -> couleur_hovered = p -> couleur_interdit;
 			} else if (p -> nbConducteurs()) {
-				// si la borne a deja un conducteur
-				// verifie que cette borne n'est pas deja reliee a l'autre borne
+			// if the terminal already has a conductor
+			// check that this terminal is not already linked to the other terminal
 				bool deja_reliee = false;
 				foreach (Conductor *f, liste_conducteurs) {
 					if (f -> terminal1 == p || f -> terminal2 == p) {
@@ -292,10 +292,10 @@ void Terminal::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
 						break;
 					}
 				}
-				// interdit si les bornes sont deja reliees, prudence sinon
+				// forbidden if the terminals are already connected, caution otherwise
 				p -> couleur_hovered = deja_reliee ? p -> couleur_interdit : p -> couleur_prudence;
 			} else {
-				// effet si on peut poser le conducteur
+			// effect if we can put the conductor
 				p -> couleur_hovered = p -> couleur_autorise;
 			}
 			terminal_precedente = p;
@@ -314,28 +314,28 @@ void Terminal::mouseReleaseEvent(QGraphicsSceneMouseEvent *e) {
 	setCursor(Qt::ArrowCursor);
 	terminal_precedente = NULL;
 	couleur_hovered  = couleur_neutre;
-	// check that the scene is indeed a Schema
+ // check that the scene is indeed a Schema
 	if (Schema *s = qobject_cast<Schema *>(scene())) {
 
-		// we stop drawing the driver's preview
+ // we stop drawing the driver preview
 		s -> poseConducteur(false);
-		// on recupere l'element sous le pointeur lors du MouseReleaseEvent
+ // we get the element under the pointer during the MouseReleaseEvent
 		QGraphicsItem *qgi = s -> itemAt(e -> scenePos(),QTransform() );
-		// s'il n'y a rien, on arrete la
+ // if there is nothing, we stop it
 		if (!qgi) return;
-		// idem si l'element obtenu n'est pas une borne
+ // same if the obtained element is not a bound
 		Terminal *p = qgraphicsitem_cast<Terminal *>(qgi);
 		if (!p) return;
-		// we reset the hover color to its default value
+ // we reset the hover color to its default value
 		p -> couleur_hovered = p -> couleur_neutre;
-		// idem s'il s'agit de la borne actuelle
+ // same if it is the current terminal
 		if (p == this) return;
-		// idem if it is a terminal of the current element and the element does not have the right to connect its own terminals
+ // same if it is a terminal of the current element and the element does not have the right to connect its own terminals
 		bool cia = ((Element *)parentItem()) -> connexionsInternesAcceptees();
 		if (!cia) foreach(QGraphicsItem *item, parentItem() -> childItems()) if (item == p) return;
-		// last check: check that this terminal is not already linked to the other terminal
+ // last check: check that this terminal is not already linked to the other terminal
 		foreach (Conductor *f, liste_conducteurs) if (f -> terminal1 == p || f -> terminal2 == p) return;
-		// otherwise, we put a conductor
+ // otherwise, we put a conductor
 		new Conductor(this, (Terminal *)qgi, 0, scene());
 	}
 }
@@ -395,20 +395,20 @@ bool Terminal::valideXml(QDomElement &borne) {
 	borne.attribute("x").toDouble(&conv_ok);
 	if (!conv_ok) return(false);
 	
-	// parse l'ordonnee
+ // parse the order
 	borne.attribute("y").toDouble(&conv_ok);
 	if (!conv_ok) return(false);
 	
-	// parse l'id
+ // parse the id
 	borne.attribute("id").toInt(&conv_ok);
 	if (!conv_ok) return(false);
 	
-	// parse l'orientation
+ // parse orientation
 	int borne_or = borne.attribute("orientation").toInt(&conv_ok);
 	if (!conv_ok) return(false);
 	if (borne_or != Terminal::Nord && borne_or != Terminal::Sud && borne_or != Terminal::Est && borne_or != Terminal::Ouest) return(false);
 	
-	// a ce stade, la borne est syntaxiquement correcte
+ // at this stage, the terminal is syntactically correct
 	return(true);
 }
 

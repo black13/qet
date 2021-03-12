@@ -14,7 +14,7 @@
 		QString nom() { return(priv_nom); }
 		
 		private:
-		int elmt_etat; // contient le code d'erreur si l'instanciation a echoue ou 0 si l'instanciation s'est bien passe
+ int elmt_etat; // contains the error code if the instantiation failed or 0 if the instantiation was successful
 		QString priv_nom;
 		QString nomfichier;
 		QPicture dessin;

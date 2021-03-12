@@ -20,7 +20,7 @@ Conductor::Conductor(Terminal *p1, Terminal* p2, Element *parent, QGraphicsScene
 	// in case of failure of the addition (driver already existing in particular)
 	if (!ajout_p1 || !ajout_p2) return;
 	destroyed = false;
-	// le conducteur est represente par un trait fin
+ // the driver is represented by a thin line
 	QPen t;
 	t.setWidthF(1.0);
 	setPen(t);
@@ -46,11 +46,11 @@ void Conductor::update(qreal x, qreal y, qreal width, qreal height) {
 	QGraphicsPathItem::update(x, y, width, height);
 }
 
-/**
-	Destructeur du Conductor. Avant d'etre detruit, le conducteur se decroche des bornes
-	auxquelles il est lie.
-*/
-/*Conductor::~Conductor() {
+ /**
+ Destroyer of the Conductor. Before being destroyed, the conductor unhooks from the terminals
+ to which it is linked.
+ */
+ /* Driver::~Driver () {
 
 }*/
 
@@ -82,14 +82,14 @@ void Conductor::calculateConductor() {
 	// debut du trajet
 	t.moveTo(depart);
 	if (depart.y() < arrivee.y()) {
-		// trajet descendant
+ // downward path
 		if ((ori_depart == Terminal::Nord && (ori_arrivee == Terminal::Sud || ori_arrivee == Terminal::Ouest)) || (ori_depart == Terminal::Est && ori_arrivee == Terminal::Ouest)) {
-			// cas « 3 »
+ // case   3  
 			qreal ligne_inter_x = (depart.x() + arrivee.x()) / 2.0;
 			t.lineTo(ligne_inter_x, depart.y());
 			t.lineTo(ligne_inter_x, arrivee.y());
 		} else if ((ori_depart == Terminal::Sud && (ori_arrivee == Terminal::Nord || ori_arrivee == Terminal::Est)) || (ori_depart == Terminal::Ouest && ori_arrivee == Terminal::Est)) {
-			// cas « 4 »
+ // case   4  
 			qreal ligne_inter_y = (depart.y() + arrivee.y()) / 2.0;
 			t.lineTo(depart.x(), ligne_inter_y);
 			t.lineTo(arrivee.x(), ligne_inter_y);
@@ -97,9 +97,9 @@ void Conductor::calculateConductor() {
 			t.lineTo(arrivee.x(), depart.y()); // cas « 2 »
 		} else t.lineTo(depart.x(), arrivee.y()); // cas « 1 »
 	} else {
-		// trajet montant
+ // upward journey
 		if ((ori_depart == Terminal::Ouest && (ori_arrivee == Terminal::Est || ori_arrivee == Terminal::Sud)) || (ori_depart == Terminal::Nord && ori_arrivee == Terminal::Sud)) {
-			// cas « 3 »
+ // case   3  
 			qreal ligne_inter_y = (depart.y() + arrivee.y()) / 2.0;
 			t.lineTo(depart.x(), ligne_inter_y);
 			t.lineTo(arrivee.x(), ligne_inter_y);
@@ -112,7 +112,7 @@ void Conductor::calculateConductor() {
 			t.lineTo(depart.x(), arrivee.y()); // cas « 2 »
 		} else t.lineTo(arrivee.x(), depart.y()); // cas « 1 »
 	}
-	// fin du trajet
+ // end of trip
 	t.lineTo(arrivee);
 	setPath(t);
 }
@@ -125,6 +125,7 @@ Draw the driver without antialiasing.
 @param qw The QWidget on which we draw
 */
 void Conductor::paint(QPainter *qp, const QStyleOptionGraphicsItem *qsogi, QWidget *qw) {
+	trace_msg("");
 	qp -> save();
 	qp -> setRenderHint(QPainter::Antialiasing,          false);
 	qp -> setRenderHint(QPainter::TextAntialiasing,      false);
@@ -164,7 +165,7 @@ bool Conductor::estVerticale(Terminal::Orientation a) {
 }
 
 /**
-	Methode de preparation a la destruction du conducteur ; le conducteur se detache de ses deux bornes
+ Method of preparation for the destruction of the conductor; the conductor is detached from its two terminals
 */
 void Conductor::destroy() {
 	destroyed = true;
@@ -173,24 +174,24 @@ void Conductor::destroy() {
 }
 
 /**
-	Methode de validation d'element XML
-	@param e Un element XML sense represente un Conductor
-	@return true si l'element XML represente bien un Conductor ; false sinon
+ XML element validation method
+ @param e A sense XML element represents a Driver
+ @return true if the XML element does represent a Driver; false otherwise
 */
 bool Conductor::valideXml(QDomElement &e){
-	// verifie le nom du tag
+ // check the name of the tag
 	if (e.tagName() != "conductor") return(false);
 	
-	// verifie la presence des attributs minimaux
+ // check the presence of minimal attributes
 	if (!e.hasAttribute("terminal1")) return(false);
 	if (!e.hasAttribute("terminal2")) return(false);
 	
 	bool conv_ok;
-	// parse l'abscisse
+ // parse the abscissa
 	e.attribute("terminal1").toInt(&conv_ok);
 	if (!conv_ok) return(false);
 	
-	// parse l'ordonnee
+ // parse the order
 	e.attribute("terminal2").toInt(&conv_ok);
 	if (!conv_ok) return(false);
 	return(true);

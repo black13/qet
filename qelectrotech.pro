@@ -14,7 +14,7 @@ HEADERS += aboutqet.h \
            contactor.h \
            del.h \
            element.h \
-           elementfixe.h \
+           FixedElement.h \
            elementperso.h \
            entree.h \
            panelappareils.h \
@@ -27,7 +27,7 @@ SOURCES += aboutqet.cpp \
            contactor.cpp \
            del.cpp \
            element.cpp \
-           elementfixe.cpp \
+           FixedElement.cpp \
            elementperso.cpp \
            entree.cpp \
            main.cpp \

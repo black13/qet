@@ -1,8 +1,8 @@
 #include "aboutqet.h"
 
 /**
-	Constructeur
-	@param parent Le QWidget parent de la boite de dialogue
+ Manufacturer
+ @param parent The parent QWidget of the dialog box
 */
 AboutQET::AboutQET(QWidget *parent) : QDialog(parent) {
 	// Titre, taille, comportement...
@@ -11,7 +11,7 @@ AboutQET::AboutQET(QWidget *parent) : QDialog(parent) {
 	setMinimumHeight(350);
 	setModal(true);
 	
-	// Trois onglets
+ // Three tabs
 	QTabWidget *onglets = new QTabWidget(this);
 	onglets -> addTab(ongletAPropos(), tr("\300 &propos"));
 	onglets -> addTab(ongletAuteurs(), tr("A&uteurs"));
@@ -31,7 +31,7 @@ AboutQET::AboutQET(QWidget *parent) : QDialog(parent) {
 }
 
 /**
-	@return Le titre QElectroTech avec son icone
+ @return The title QElectroTech with its icon
 */
 QWidget *AboutQET::titre() {
 	QWidget *icone_et_titre = new QWidget();
@@ -52,7 +52,7 @@ QWidget *AboutQET::titre() {
 }
 
 /**
-	@return Le widget contenu par l'onglet « A propos »
+ @return The widget contained by the About tab
 */
 QWidget *AboutQET::ongletAPropos() {
 	QLabel *apropos = new QLabel(
@@ -81,7 +81,7 @@ QWidget *AboutQET::ongletAuteurs() {
 }
 
 /**
-	@return Le widget contenu par l'onglet « Accord de Licence »
+ @return The widget contained by the License Agreement tab
 */
 QWidget *AboutQET::ongletLicence() {
 	QWidget *licence = new QWidget();

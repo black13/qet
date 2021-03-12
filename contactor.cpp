@@ -1,16 +1,16 @@
 #include "contactor.h"
 
-/**
-	Constructeur
-	@param parent Le QObject parent de l'element.
-	@param scene  La scene sur laquelle l'element est affiche
-*/
-Contactor::Contactor(QGraphicsItem *parent, Schema *scene) : FixedElement(parent, scene) {
-	// taille et hotspot
-	setSize(15, 70);
-	setHotspot(QPoint(10, 5));
+ /**
+ Manufacturer
+ @param parent The parent QObject of the element.
+ @param scene The scene on which the element is displayed
+ */
+ Contactor :: Contactor (QGraphicsItem * parent, Schema * scene): FixedElement(parent, scene) {
+ // size and hotspot
+ setSize (15, 70);
+ setHotspot (QPoint (10, 5));
 	
-	// ajout de deux bornes a l'element
+ // add two bounds to the element
 	new Terminal(0,  0, Terminal::Nord, this, scene);
 	new Terminal(0, 60, Terminal::Sud,  this, scene);
 }
@@ -23,22 +23,22 @@ int Contactor::nbBornes() const {
 }
 
 /**
-	Fonction qui effectue le rendu graphique du contacteur
-	@param p Le QPainter a utiliser pour dessiner l'element
-	@param o Les options de dessin
+ Function that performs the graphic rendering of the contactor
+ @param p The QPainter to use to draw the element
+ @param o The drawing options
 */
 void Contactor::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
-	// traits de couleur noire
+ // black lines
 	QPen t;
 	t.setColor(Qt::black);
 	t.setWidthF(1.0);
 	t.setJoinStyle(Qt::MiterJoin);
 	p -> setPen(t);
 	
-	// une ligne eventuellement antialiasee
+ // a possibly anti-aliasing line
 	p -> drawLine(-5, 19, 0, 40);
 	
-	// deux lignes JAMAIS antialiasees (annulation des renderhints)
+ // two lines NEVER anti-aliases (cancellation of renderhints)
 	p -> save();
 	p -> setRenderHint(QPainter::Antialiasing,          false);
 	p -> setRenderHint(QPainter::TextAntialiasing,      false);
@@ -49,7 +49,7 @@ void Contactor::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 }
 
 /**
-	@return l'ID du type "Contactor"
+ @return the ID of the "Contactor" type
 */
 QString Contactor::typeId() {
 	return(QString("0"));
