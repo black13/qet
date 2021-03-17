@@ -1,10 +1,9 @@
 #ifndef ABOUTQET_H
 	#define ABOUTQET_H
-	//#include <QtGui>
-	#include <QtWidgets>
+	#include <QtGui>
 	/**
-		This class represents the dialog box
-		"About QElectroTech"
+	This class represents the dialog box
+	About QELECTROTECH �
 	*/
 	class AboutQET : public QDialog {
 		Q_OBJECT

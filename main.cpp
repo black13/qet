@@ -1,28 +1,27 @@
 #include <QApplication>
 #include <QTranslator>
 #include "qetapp.h"
-#include <QtDebug>
-#include "debug.h"
 
 /**
-Main function of the QElectroTech program
-@param argc number of parameters
-@param argv parameters
+	Main function of the QELECTROTECH program
+	@param ARGC Parameter Name
+	@param args parameters
 */
 int main(int argc, char **argv) {
 	// Creation de l'application
+	// Creation de l'application
 	QApplication app(argc, argv);
-
-	trace_msg("");
-
-
-
+	// Traducteur
 	// Translator
 	QTranslator trad;
 	//trad.load("qet_en");
+	//trad.load("qet_en");
 	app.installTranslator(&trad);
-	// Creation and display of the QETApp: QElectroTechApplication
+	// Creation and display of Qetappp: qlectrotechapplication
+	// Creation et affichage du QETApp : QElectroTechApplication
+	// Creation and display of Qetappp: qlectrotechapplication
 	(new QETApp()) -> show();
-	// Execution of the application
+	// Execution de l'application
+	// Execution de l'application
 	return(app.exec());
 }

@@ -4,14 +4,14 @@
 	#include "borne.h"
 	class Element;
 	/**
-		Cette classe represente un conducteur. Un conducteur relie deux bornes d'element.
+		This class represents a driver.A driver connects two element terminals.
 	*/
 	class Conducteur : public QGraphicsPathItem {
 		public:
 		enum { Type = UserType + 1001 };
     	virtual int type() const { return Type; }
 		Conducteur(Borne *, Borne *, Element * = 0, QGraphicsScene * = 0);
-		//virtual ~Conducteur();
+		// virtual ~ conductor ();
 		
 		void destroy();
 		bool isDestroyed() const { return(destroyed); }
@@ -20,12 +20,12 @@
 		void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
 		static bool valideXml(QDomElement &);
 		
-		///Premiere borne a laquelle le fil est rattache
+		/// first terminal at which the wire is attached
 		Borne *borne1;
-		///Deuxieme borne a laquelle le fil est rattache
+		/// second terminal at which the thread is attached
 		Borne *borne2;
 		private:
-		/// booleen indiquant si le fil est encore valide
+		/// boolen indicating if the wire is still valid
 		bool destroyed;
 		
 		void calculeConducteur();

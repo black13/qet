@@ -3,49 +3,49 @@
 #include <QGraphicsTextItem>
 
 /**
-	Constructeur
-	@param parent Le QObject parent de l'element.
-	@param scene  La scene sur laquelle l'element est affiche
+Manufacturer
+@Param parent The parent QObject of the element.
+@Param scene the scene on which the element is displays
  */
-DEL::DEL(QGraphicsItem *parent, Schema *scene) : FixedElement(parent, scene) {
-	// taille et hotspot
+DEL::DEL(QGraphicsItem *parent, Schema *scene) : ElementFixe(parent, scene) {
+// size and hotspot
 	setSize(30, 70);
 	setHotspot(QPoint(15, 5));
 	
-	// ajout de deux bornes a l'element
-	new Terminal(0,  0, Terminal::Nord, this, scene);
-	new Terminal(0, 60, Terminal::Sud,  this, scene);
+// adding two terminals to the element
+	new Borne(0,  0, Borne::Nord, this, scene);
+	new Borne(0, 60, Borne::Sud,  this, scene);
 	
 	peut_relier_ses_propres_bornes = true;
 }
 
 /**
-	@return Le nombre actuel de bornes de l'element
+@return the current number of element terminals
 */
 int DEL::nbBornes() const {
 	return(2);
 }
 
 /**
-	Fonction qui effectue le rendu graphique de la DEL
-	@param p Le QPainter a utiliser pour dessiner l'element
-	@param o Les options de dessin
+Function that makes the graphic rendering of the LED
+@param p the qpainter to use to draw the element
+@param o drawing options
 */
 void DEL::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
-	// traits de couleur noire
+// Black color traits
 	QPen t;
 	t.setColor(Qt::black);
 	t.setWidthF(1.0);
 	p -> setPen(t);
 	
-	// un cercle a fond blanc
+// a circle with white background
 	p -> setBrush(QBrush(Qt::white, Qt::SolidPattern));
 	p -> drawEllipse(-10, 20, 20, 20);
 	p -> setBrush(Qt::NoBrush);
-	// deux lignes eventuellement antialiasees
+// two lines eventually antialiasis
 	p -> drawLine(-7, 23,  7, 37);
 	p -> drawLine( 7, 23, -7, 37);
-	// deux lignes JAMAIS antialiasees
+// two lines ever antialiasis
 	p -> save();
 	p -> setRenderHint(QPainter::Antialiasing,          false);
 	p -> setRenderHint(QPainter::TextAntialiasing,      false);
@@ -56,7 +56,7 @@ void DEL::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 }
 
 /**
-	@return l'ID du type "DEL"
+@return l'ID du type "DEL"
 */
 QString DEL::typeId() {
 	return(QString("1"));

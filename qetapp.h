@@ -1,23 +1,20 @@
 #ifndef QETAPP_H
-#define QETAPP_H
-#include <QtWidgets>
-#include <QMdiArea>
-#include <QPrinter>
-#include <QPrintDialog>
-	class SchemaView;
+	#define QETAPP_H
+	#include <QtGui>
+	class SchemaVue;
 	class PanelAppareils;
 	/**
-		Cette classe represente la fenetre principale de QElectroTech et,
-		ipso facto, la plus grande partie de l'interface graphique de QElectroTech.
-		Il s'agit d'un objet QMainWindow avec un objet « Schema » en guise de widget central
-		et un « Panel d'Appareils » en guise de widget « Dock ».
+	This class represents the main window of QELECTROTECH and,
+	IPSO FACTO, most of the QELECTROTECH graphical interface.
+	It is a QMainWindow object with an object ï¿½ schema ï¿½ as a central widget
+	and an ï¿½ panel of appliances ï¿½ as a widget ï¿½ dock ï¿½.
 	*/
 	class QETApp : public QMainWindow {
 		Q_OBJECT
 		public:
 		QETApp(QWidget *parent=0);
 		void closeEvent(QCloseEvent * event );
-		void addSchemaVue(SchemaView *);
+		void addSchemaVue(SchemaVue *);
 		
 		public slots:
 		void systray(QSystemTrayIcon::ActivationReason raison);
@@ -32,15 +29,15 @@
 		bool dialogue_enregistrer_sous();
 		bool enregistrer();
 		bool nouveau();
-		bool open();
+		bool ouvrir();
 		bool fermer();
 		
 		protected:
-		// Actions faisables au travers de menus dans l'application QElectroTech
+		// Feasible actions through menus in the QELECTROTECH application
 		QAction *mode_selection;
 		QAction *mode_visualise;
 		QAction *nouveau_fichier;
-		QAction *open_fichier;
+		QAction *ouvrir_fichier;
 		QAction *fermer_fichier;
 		QAction *enr_fichier;
 		QAction *enr_fichier_sous;
@@ -83,31 +80,31 @@
 		QAction *menu_systray_masquer_restaurer;
 		
 		private:
-		QMdiArea workspace;
-		SchemaView *schemaInProgress();
+		QWorkspace workspace;
+		SchemaVue *schemaEnCours();
 		QSignalMapper windowMapper;
-		/// Dock pour le Panel d'Appareils
+		/// dock for the panel of appliances
 		QDockWidget *qdw_pa;
-		/// Panel d'Appareils
+		/// Device Panel
 		PanelAppareils *pa;
-		/// Elements de menus pour l'icone du systray
+		/// Menu Elements for the Systray Icons
 		QMenu *menu_systray;
 		QAction *systray_masquer;
 		QAction * config_fullscreen;
 		QAction *systray_quitter;
-		QMenu *menu_windows;
-		/// Icone dans le systray
+		QMenu *menu_fenetres;
+		/// icon in the systray
 		QSystemTrayIcon *qsti;
-		/// Geometrie de la fenetre principale
+		/// Geometry of the main window
 		QByteArray wg;
 		void menus();
 		void toolbar();
 		QToolBar *barre_outils;
 		
 		private slots:
-		void slot_cut();
+		void slot_couper();
 		void slot_copier();
-		void slot_paste();
+		void slot_coller();
 		void slot_zoomPlus();
 		void slot_zoomMoins();
 		void slot_zoomFit();

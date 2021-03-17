@@ -51,12 +51,12 @@ Programming : Xavier Guerrin &lt;xavier.guerrin@gmail.com&gt;</translation>
     </message>
     <message>
         <location filename="aboutqet.cpp" line="105"/>
-        <source>Le file texte contenant la licence GNU/GPL est introuvable - bon bah de toute fa&#xe7;on, vous la connaissez par c&amp;oelig;ur non ?</source>
+        <source>Le fichier texte contenant la licence GNU/GPL est introuvable - bon bah de toute fa&#xe7;on, vous la connaissez par c&amp;oelig;ur non ?</source>
         <translation type="unfinished">The text file containing the GNU/GPL license could not be found - however, you know it by heart, don&apos;t you ?</translation>
     </message>
     <message>
         <location filename="aboutqet.cpp" line="109"/>
-        <source>Le file texte contenant la licence GNU/GPL existe mais n&apos;a pas pu &#xea;tre ouvert - bon bah de toute fa&#xe7;on, vous la connaissez par c&amp;oelig;ur non ?</source>
+        <source>Le fichier texte contenant la licence GNU/GPL existe mais n&apos;a pas pu &#xea;tre ouvert - bon bah de toute fa&#xe7;on, vous la connaissez par c&amp;oelig;ur non ?</source>
         <translation type="unfinished">The text file containing the GNU/GPL license exists but could not be opened - however, you know it by heart, don&apos;t you ?</translation>
     </message>
 </context>
@@ -142,7 +142,7 @@ Programming : Xavier Guerrin &lt;xavier.guerrin@gmail.com&gt;</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="269"/>
-        <source>&amp;File</source>
+        <source>&amp;Fichier</source>
         <translation>&amp;File</translation>
     </message>
     <message>
@@ -177,7 +177,7 @@ Programming : Xavier Guerrin &lt;xavier.guerrin@gmail.com&gt;</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="156"/>
-        <source>&amp;open</source>
+        <source>&amp;Ouvrir</source>
         <translation>&amp;Open</translation>
     </message>
     <message>
@@ -387,7 +387,7 @@ Programming : Xavier Guerrin &lt;xavier.guerrin@gmail.com&gt;</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="313"/>
-        <source>Pinup</source>
+        <source>Afficher</source>
         <translation>Display</translation>
     </message>
     <message>
@@ -397,7 +397,7 @@ Programming : Xavier Guerrin &lt;xavier.guerrin@gmail.com&gt;</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="379"/>
-        <source>Exporter vers le file</source>
+        <source>Exporter vers le fichier</source>
         <translation>Export to file</translation>
     </message>
     <message>
@@ -417,27 +417,27 @@ Programming : Xavier Guerrin &lt;xavier.guerrin@gmail.com&gt;</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="437"/>
-        <source>Impossible d&apos;ecrire dans ce file</source>
+        <source>Impossible d&apos;ecrire dans ce fichier</source>
         <translation>Can&apos;t write to the file</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="475"/>
-        <source>open un file</source>
+        <source>Ouvrir un fichier</source>
         <translation>Open a file</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="478"/>
-        <source>Schema QelectroTech (*.qet);;Files XML (*.xml);;Tous les files (*)</source>
+        <source>Schema QelectroTech (*.qet);;Fichiers XML (*.xml);;Tous les fichiers (*)</source>
         <translation>QelectroTech Schema (*.qet);;XML Files (*.xml);;All Files (*)</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="484"/>
-        <source>Impossible de lire ce file</source>
+        <source>Impossible de lire ce fichier</source>
         <translation>Can&apos;t read that file</translation>
     </message>
     <message>
         <location filename="qetapp.cpp" line="489"/>
-        <source>Ce file n&apos;est pas un document XML valide.</source>
+        <source>Ce fichier n&apos;est pas un document XML valide.</source>
         <translation>This file is not a valid XML Document.</translation>
     </message>
     <message>

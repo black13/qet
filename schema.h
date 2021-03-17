@@ -2,12 +2,10 @@
 	#define SCHEMA_H
 	#define GRILLE_X 10
 	#define GRILLE_Y 10
-	#include <QtWidgets>
-	#include <QtXml/QtXml>
-    #include <QDebug>
-    #include <QUuid>
+	#include <QtGui>
+	#include <QtXml>
 	class Element;
-	class Terminal;
+	class Borne;
 	class Schema : public QGraphicsScene {
 		Q_OBJECT
 		public:
@@ -31,14 +29,14 @@
 		private:
 		QGraphicsLineItem *poseur_de_conducteur;
 		bool doit_dessiner_grille;
-		// elements du cartouche
+		// Cartridge elements
 		QString auteur;
 		QDate   date;
 		QString titre;
-		QString folio;       // vraiment necessaire ce truc ?
-		QString nom_fichier; // meme remarque
-		Element *elementFromXml(QDomElement &e, QHash<int, Terminal *> &);
-
+		QString folio;// really necessarize this thing?
+		QString nom_fichier;// same comment
+		Element *elementFromXml(QDomElement &e, QHash<int, Borne *> &);
+		
 		private slots:
 		void slot_checkSelectionChange();
 		

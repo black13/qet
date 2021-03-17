@@ -1,34 +1,33 @@
 #include "entree.h"
 
 /**
-	Constructeur
-	@param parent Le QObject parent de l'element.
-	@param scene  La scene sur laquelle l'element est affiche
+	Constructor 
+	@Param parent The parent QObject of the element.
+	@Param scene the scene on which the element is displays
 */
-Entree::Entree(QGraphicsItem *parent, Schema *scene) : FixedElement(parent, scene) {
-	// taille et hotspot
+Entree::Entree(QGraphicsItem *parent, Schema *scene) : ElementFixe(parent, scene) {
+	// size and hotspot
 	setSize(20, 40);
 	setHotspot(QPoint(10, 15));
 	
-	// ajout d'une borne a l'element
-	new Terminal(0,  15, Terminal::Sud, this, scene);
+	// Add a terminal to the element
+	new Borne(0,  15, Borne::Sud, this, scene);
 }
 
 /**
-	@return Le nombre actuel de bornes de l'element
+	@return the current number of element terminals
 */
 int Entree::nbBornes() const {
 	return(1);
 }
 
 /**
-	Fonction qui effectue le rendu graphique du contacteur
-	@param p Le QPainter a utiliser pour dessiner l'element
-	@param o Les options de dessin
+	Function that makes the graphic rendering of the contactor
+	@param p the qpainter to use to draw the element
+	@param o drawing options
 */
 void Entree::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
-	//int ret = _CrtDbgReportW(_CRT_ERROR, _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(QT_VERSION_STR), reinterpret_cast<const wchar_t *> (QString::fromLatin1("video/").utf16()));
-	// traits de couleur noire
+	// Black color traits
 	QPen t;
 	t.setColor(Qt::black);
 	t.setWidthF(1.0);
@@ -36,7 +35,7 @@ void Entree::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 	p -> setPen(t);
 	p -> setBrush(Qt::black);
 	
-	// Dessin du triangle
+	// Triangle drawing
 	static const QPointF points[3] = {
 		QPointF(-7.5, -13),
 		QPointF( 7.5, -13),
@@ -46,7 +45,7 @@ void Entree::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 	p -> drawPolygon(points, 3);
 	p -> setBrush(Qt::NoBrush);
 	
-	// une ligne JAMAIS antialiasee (annulation des renderhints)
+	// a line ever antialiased (cancellation of renderehints)
 	p -> save();
 	p -> setRenderHint(QPainter::Antialiasing,          false);
 	p -> setRenderHint(QPainter::TextAntialiasing,      false);
@@ -56,7 +55,7 @@ void Entree::paint(QPainter *p, const QStyleOptionGraphicsItem *) {
 }
 
 /**
-	@return l'ID du type "Contactor"
+	@return the ID of the type "Contactor"
 */
 QString Entree::typeId() {
 	return(QString("2"));

@@ -1,10 +1,10 @@
 #ifndef PANELAPPAREILS_H
 	#define PANELAPPAREILS_H
-	#include <QtWidgets>
+	#include <QtGui>
 	/**
-		Cette classe represente le panel d'appareils (en tant qu'element
-		graphique) dans lequel l'utilisateur choisit les composants de
-		son choix et les depose sur le schema par drag'n drop.
+	This class represents the panel of devices (as an element
+	graph) in which the user chooses the components of
+	His choice and deposits them on the schema by Drag'n Drop.
 	*/
 	class PanelAppareils : public QListWidget {
 		Q_OBJECT

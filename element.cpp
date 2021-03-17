@@ -1,67 +1,67 @@
 #include "element.h"
 #include "schema.h"
 #include <QtDebug>
-#include "debug.h"
-/*** Methodes publiques ***/
+
+/*** Public methods ***/
 
 /**
-	Constructeur pour un element sans scene ni parent
+Builder for an element without a scene or parent
 */
-Element::Element(QGraphicsItem *parent, Schema *scene) : QGraphicsItem(parent) {
+Element::Element(QGraphicsItem *parent, Schema *scene) : QGraphicsItem(parent, scene) {
 	sens = true;
 	peut_relier_ses_propres_bornes = false;
 }
 
 /**
-	Methode principale de dessin de l'element
-	@param painter Le QPainter utilise pour dessiner l'elment
-	@param options Les options de style a prendre en compte
-	@param widget  Le widget sur lequel on dessine
+	Main method of drawing of the element
+	@param painter the qpainter uses to draw the element
+	@param Options Style options to take into account
+	@param widget the widget on which we draw
 */
 void Element::paint(QPainter *painter, const QStyleOptionGraphicsItem *options, QWidget *) {
-	// Dessin de l'element lui-meme
+// drawing the element itself
 	paint(painter, options);
 	
-	// Dessin du cadre de selection si necessaire
+// drawing the selection frame if necessary
 	if (isSelected()) drawSelection(painter, options);
 }
 
 /**
-	@return Le rectangle delimitant le contour de l'element
+@return the rectangle delimiting the outline of the element
 */
 QRectF Element::boundingRect() const {
 	return(QRectF(QPointF(-hotspot_coord.x(), -hotspot_coord.y()), dimensions));
 }
 
 /**
-	Definit la taille de l'element sur le schema. Les tailles doivent etre
-	des multiples de 10 ; si ce n'est pas le cas, les dimensions indiquees
-	seront arrrondies aux dizaines superieures.
-	@param wid Largeur de l'element
-	@param hei Hauteur de l'element
-	@return La taille finale de l'element
+	Defines the size of the element on the schema.Sizes must be
+	multiples of 10;If this is not the case, the dimensions indicated
+	will be arriving with the superior dozens.
+	@param wid Width of the element
+	@param here today the l'item
+	@return the final size of the element
 */
 QSize Element::setSize(int wid, int hei) {
 	prepareGeometryChange();
-	// chaque dimension indiquee est arrondie a la dizaine superieure
+	// each dimension indicated is rounded to the ten superior
 	while (wid % 10) ++ wid;
 	while (hei % 10) ++ hei;
-	// les dimensions finales sont conservees et retournees
+	// the final dimensions are preserved and returned
 	return(dimensions = QSize(wid, hei));
 }
 
 /**
-	Definit le hotspot de l'element par rapport au coin superieur gauche de son rectangle delimitant.
-	Necessite que la taille ait deja ete definie
-	@param hsx Abscisse du hotspot
-	@param hsy Ordonnee du hotspot
+	Defines the hotspot of the element with respect to the left area of its deimitant rectangle.
+	Necessity that the size has already been defined
+	@param HSX hotspot abscissa
+	@param hsy ordinate hotspot
 */
 QPoint Element::setHotspot(QPoint hs) {
-	// la taille doit avoir ete definie
+	// the size must have been defined
 	prepareGeometryChange();
 	if (dimensions.isNull()) hotspot_coord = QPoint(0, 0);
 	else {
-		// les coordonnees indiquees ne doivent pas depasser les dimensions de l'element
+		// The coordinates indicated should not exceed the dimensions of the element
 		int hsx = hs.x() > dimensions.width() ? dimensions.width() : hs.x();
 		int hsy = hs.y() > dimensions.height() ? dimensions.height() : hs.y();
 		hotspot_coord = QPoint(hsx, hsy);
@@ -70,28 +70,29 @@ QPoint Element::setHotspot(QPoint hs) {
 }
 
 /**
-	@return Le hotspot courant de l'element
+@return the current hotspot of the element
 */
 QPoint Element::hotspot() const {
 	return(hotspot_coord);
 }
 
 /**
-	Selectionne l'element
+SELECT THE ELEMENT
 */
 void Element::select() {
 	setSelected(true);
 }
 
 /**
-	Deselectionne l'element
+Deselectionne l'element
+Deselectionne l'element
 */
 void Element::deselect() {
 	setSelected(false);
 }
 
 /**
-	@return La pixmap de l'element
+@return The Pixmap of the item
 */
 QPixmap Element::pixmap() {
 	if (apercu.isNull()) updatePixmap(); // on genere la pixmap si ce n'est deja fait
@@ -99,58 +100,48 @@ QPixmap Element::pixmap() {
 }
 
 /**
-	@todo distinguer les bornes avec un cast dynamique
+@todo distinguish the terminals with a dynamic cast
 */
 QVariant Element::itemChange(GraphicsItemChange change, const QVariant &value) {
 	if (change == QGraphicsItem::ItemPositionChange || change == QGraphicsItem::ItemSelectedChange) {
-		foreach(QGraphicsItem *qgi, childItems()) {
-			if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) p -> updateConducteur();
+		foreach(QGraphicsItem *qgi, children()) {
+			if (Borne *p = qgraphicsitem_cast<Borne *>(qgi)) p -> updateConducteur();
 		}
 	}
 	return(QGraphicsItem::itemChange(change, value));
 }
 
 /**
-	@return L'orientation en cours de l'element : true pour une orientation verticale, false pour une orientation horizontale
+@return The current orientation of the element: True for a vertical orientation, false for a horizontal orientation
 */
 bool Element::orientation() const {
 	return(sens);
 }
 
 /**
-	Inverse l'orientation de l'element
-	@return La nouvelle orientation : true pour une orientation verticale, false pour une orientation horizontale
+Inverts the orientation of the element
+@return The new orientation: True for a vertical orientation, false for horizontal orientation
 */
 bool Element::invertOrientation() {
-	// inversion du sens
 	sens = !sens;
-	// on cache temporairement l'element pour eviter un bug graphique
+// reversing meaning
+// Temporarily hide the element to avoid a graphic bug
 	hide();
-	// rotation en consequence et rafraichissement de l'element graphique
-	if (sens)
-	{
-		setTransform(QTransform().rotate(90.0), true);
-	}
-	else
-	{
-		setTransform(QTransform().rotate(-90.0), true);
-	}
-	
-	//rotate(sens ? 90.0 : -90.0);
-	// on raffiche l'element, on le reselectionne et on le rafraichit
+// rotation in consequence and refreshment of the graphic element
+	rotate(sens ? 90.0 : -90.0);
+// We refine the element, we do it reselect and we refresh it
 	show();
 	select();
 	update();
 	return(sens);
 }
 
-/*** Methodes protegees ***/
+/*** Methods proteges ***/
 
 /**
-
-Draw a small coordinate system (x and y axes) relative to the element
-@param painter The QPainter to use to draw the axes
-@param options The style options to take into account
+Draws a small repere (x and y axes) relating to the element
+@param painter the qpainter to use to draw the axes
+@param Options Style options to take into account
 */
 void Element::drawAxes(QPainter *painter, const QStyleOptionGraphicsItem *) {
 	painter -> setPen(Qt::blue);
@@ -163,23 +154,20 @@ void Element::drawAxes(QPainter *painter, const QStyleOptionGraphicsItem *) {
 	painter -> drawLine(0, 10, 3,  7);
 }
 
-/*** Methodes privees ***/
+/*** PRIVATE METHODS ***/
 
 /**
-
-Draws the selection frame of the element in a systematically non-anti-aliasing manner.
-@param qp The QPainter to use for drawing the terminals.
-@param options The style options to take into account
+	Draws the selection frame of the systematically non-antialiased manner.
+	@param QP The qpainter to use to draw the terminals.
+	@param Options Style options to take into account
  */
 void Element::drawSelection(QPainter *painter, const QStyleOptionGraphicsItem *) {
-
-	
 	painter -> save();
-	// Annulation des renderhints
+// cancellation of renderehints
 	painter -> setRenderHint(QPainter::Antialiasing,          false);
 	painter -> setRenderHint(QPainter::TextAntialiasing,      false);
 	painter -> setRenderHint(QPainter::SmoothPixmapTransform, false);
-	// Dessin du cadre de selection en gris
+// drawing the selection frame in gray
 	QPen t;
 	t.setColor(Qt::gray);
 	t.setStyle(Qt::DashDotLine);
@@ -190,68 +178,65 @@ void Element::drawSelection(QPainter *painter, const QStyleOptionGraphicsItem *)
 }
 
 /**
-	Fonction initialisant et dessinant la pixmap de l'element.
+Initializing and drawing the Pixmap of the element.
 */
 void Element::updatePixmap() {
-	// Pixmap transparente faisant la taille de base de l'element
+// transparent pixmap making the basic size of the element
 	apercu = QPixmap(dimensions);
 	apercu.fill(QColor(255, 255, 255, 0));
-	// QPainter sur la pixmap, avec antialiasing
+// qpainter on the pixmap, with antialiasing
 	QPainter p(&apercu);
 	p.setRenderHint(QPainter::Antialiasing, true);
 	p.setRenderHint(QPainter::SmoothPixmapTransform, true);
-	// Translation de l'origine du repere de la pixmap
+// Translation of the origin of the repere of the pixmap
 	p.translate(hotspot_coord);
-	// L'element se dessine sur la pixmap
+// the element draws on the pixmap
 	paint(&p, 0);
 }
 
 /**
-Change the position of the element making sure that the element
-remains on the grid of the Schema to which it belongs.
-@param p New element coordinates
+Change the position of the element by ensuring that the element
+remains on the scheme grid to which it belongs.
+@Param p New coordinates of the element
 */
 void Element::setPos(const QPointF &p) {
 	if (p == pos()) return;
-	// pas la peine de positionner sur la grille si l'element n'est pas sur un Schema
+	// not worth positioning on the grid if the element is not on a schema
 	if (scene()) {
-		// arrondit l'abscisse a 10 px pres
+	// round up the abscissa at 10 px near
 		int p_x = qRound(p.x() / 10.0) * 10;
-		// arrondit l'ordonnee a 10 px pres
+		// round up the ordinate to 10 px near
 		int p_y = qRound(p.y() / 10.0) * 10;
 		QGraphicsItem::setPos(p_x, p_y);
 	} else QGraphicsItem::setPos(p);
-	// actualise les bornes / conducteurs
-	foreach(QGraphicsItem *qgi, childItems()) {
-		if (Terminal *p = qgraphicsitem_cast<Terminal *>(qgi)) p -> updateConducteur();
+	// update the terminals / drivers
+	// update the terminals / drivers
+	foreach(QGraphicsItem *qgi, children()) {
+		if (Borne *p = qgraphicsitem_cast<Borne *>(qgi)) p -> updateConducteur();
 	}
 }
 
 /**
-	Change la position de l'element en veillant a ce que l'element
-	reste sur la grille du Schema auquel il appartient.
-	@param x Nouvelle abscisse de l'element
-	@param y Nouvelle ordonnee de l'element
+	Change the position of the element by ensuring that the element
+	remains on the scheme grid to which it belongs.
+	@param x new abscissa element
+	@param y new ordinate element
 */
 void Element::setPos(qreal x, qreal y) {
 	setPos(QPointF(x, y));
 }
 
 /**
-	Gere les mouvements de souris lies a l'element, notamment
+	Managing the mouse movements in the element, in particular
 */
 void Element::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
-
-	trace_msg("");
-	//int ret = _CrtDbgReportW(_CRT_ERROR, _CRT_WIDE(__FILE__), __LINE__, _CRT_WIDE(QT_VERSION_STR), reinterpret_cast<const wchar_t *> (QString::fromLatin1("video/").utf16()));
-	
 	/*&& (flags() & ItemIsMovable)*/ // on le sait qu'il est movable
 	if (e -> buttons() & Qt::LeftButton) {
 		QPointF oldPos = pos();
 		setPos(mapToParent(e->pos()) - matrix().map(e->buttonDownPos(Qt::LeftButton)));
 		QPointF diff = pos() - oldPos;
 		
-		// Recupere la liste des elements selectionnes
+		// RECEPE THE LIST OF SELECTING ELEMENTS
 		QList<QGraphicsItem *> selectedItems;
 		if (scene()) {
 			selectedItems = scene() -> selectedItems();
@@ -259,7 +244,7 @@ void Element::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
 			while (parent && parent->isSelected()) selectedItems << parent;
 		}
 		
-		// Deplace tous les elements selectionnes
+		// DEPLACE ALL SELECTION ELEMENTS
 		foreach (QGraphicsItem *item, selectedItems) {
 			if (!item->parentItem() || !item->parentItem()->isSelected())
 				if (item != this) item->setPos(item->pos() + diff);
@@ -268,21 +253,22 @@ void Element::mouseMoveEvent(QGraphicsSceneMouseEvent *e) {
 }
 
 /**
-	Permet de savoir si un element XML (QDomElement) represente bien un element
-	@param e Le QDomElement a valide
-	@return true si l'element XML est un Element, false sinon
+Lets you know if an XML element (QDomellation) represents an element
+@param by qdomelement of painude
+@return true if the XML element is an element, false otherwise
 */
 bool Element::valideXml(QDomElement &e) {
 	// verifie le nom du tag
+	// verify the name of the tag
 	if (e.tagName() != "element") return(false);
 	
-	// verifie la presence des attributs minimaux
+	// check the presence of minimum attributes
 	if (!e.hasAttribute("type")) return(false);
 	if (!e.hasAttribute("x"))    return(false);
 	if (!e.hasAttribute("y"))    return(false);
 	
 	bool conv_ok;
-	// parse l'abscisse
+	// Parse the abscissa
 	e.attribute("x").toDouble(&conv_ok);
 	if (!conv_ok) return(false);
 	

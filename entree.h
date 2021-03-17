@@ -2,10 +2,10 @@
 	#define ENTREE_H
 	#include "elementfixe.h"
 	/**
-		This class inherits from the Fixed Element class to define a
-		Entrance.
+		Cette classe herite de la classe Element Fixe pour definir une
+		entree.
 	*/
-	class Entree : public FixedElement{
+	class Entree : public ElementFixe{
 		public:
 		Entree(QGraphicsItem * = 0, Schema * = 0);
 		virtual int nbBornes() const;

@@ -1,48 +1,48 @@
 #include "panelappareils.h"
-#include "contactor.h"
+#include "contacteur.h"
 #include "del.h"
 #include "entree.h"
 #include "elementperso.h"
-#include "debug.h"
+
 /**
-	Constructeur
-	@param parent Le QWidget parent du panel d'appareils
-	@todo : definir une classe heritant de QListWidgetItem et automatiser tout ca
+	Manufacturer
+	@param parent The parent Qwidget of the device panel
+	@todo: DEFINE A HERITANT QLISTWIDGETITEM class and automate all that
 */
 PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 	
 	// selection unique
 	setSelectionMode(QAbstractItemView::SingleSelection);
 	
-	// drag'n drop autorise
+	// Drag'n drop authorizes
 	setDragEnabled(true);
 	setAcceptDrops(false);
 	setDropIndicatorShown(false);
 	
-	// style, mouvement et taille des elements
+	// style, movement and size of the elements
 	setIconSize(QSize(50, 50));
 	setMovement(QListView::Free);
 	setViewMode(QListView::ListMode);
 	
-	// donnees
-	/*Element *del = new DEL(0,0);
-	Element *contacteur = new Contactor(0,0);
+	// data
+	/* Element * of the = new of (0.0);
+	Element * contactor = new contactor (0.0);
 	Element *entree = new Entree(0, 0);*/
 	
 	QListWidgetItem *qlwi;
-	QString whats_this = tr("This is a aliment that you can insert  into your diagram schema by clicking and dragging");
-	QString tool_tip = tr("Click - drop this aliment on the diagram \ 351ma to insert ");
+	QString whats_this = tr("Ceci est un \351l\351ment que vous pouvez ins\351rer dans votre sch\351ma par cliquer-d\351placer");
+	QString tool_tip = tr("Cliquer-d\351posez cet \351l\351ment sur le sch\351ma pour ins\351rer un \351l\351ment ");
 	
-	// remplissage de la liste
+	// fill the list
 	QDir dossier_elements("elements/");
 	QStringList filtres;
 	filtres << "*.elmt";
-	QStringList files = dossier_elements.entryList(filtres, QDir::Files, QDir::Name);
-	foreach(QString file, files) {
+	QStringList fichiers = dossier_elements.entryList(filtres, QDir::Files, QDir::Name);
+	foreach(QString fichier, fichiers) {
 		int etat;
-		ElementPerso *elmt_perso = new ElementPerso(file, 0, 0, &etat);
+		ElementPerso *elmt_perso = new ElementPerso(fichier, 0, 0, &etat);
 		if (etat != 0) {
-			qDebug() << "Component loading" << file << "failed with error code" << etat;
+			qDebug() << "Le chargement du composant" << fichier << "a echoue avec le code d'erreur" << etat;
 			continue;
 		}
 		qlwi = new QListWidgetItem(QIcon(elmt_perso -> pixmap()), elmt_perso -> nom(), this);
@@ -50,10 +50,10 @@ PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 		qlwi -> setToolTip(elmt_perso -> nom());
 		qlwi -> setWhatsThis(whats_this);
 		qlwi -> setFlags(Qt::ItemIsSelectable | Qt::ItemIsDragEnabled | Qt::ItemIsEnabled);
-		qlwi -> setData(42, file);
+		qlwi -> setData(42, fichier);
 	}
 	
-	// force du noir sur une alternance de blanc (comme le schema) et de bleu clair
+	// black force on an alternation of white (like the scheme) and light blue
 	QPalette qp = palette();
 	setAlternatingRowColors(true);
 	qp.setColor(QPalette::Text, Qt::black);
@@ -63,32 +63,30 @@ PanelAppareils::PanelAppareils(QWidget *parent) :  QListWidget(parent) {
 }
 
 /**
-Manage movement during a drag'n drop
+	Gera the movement during a Drag'n Drop
 */
-void PanelAppareils::dragMoveEvent(QDragMoveEvent *) {
+void PanelAppareils::dragMoveEvent(QDragMoveEvent */*e*/) {
 }
 
 /**
-	Manage the deposit during a drag'n drop
+	GE DEPOSIT DURING DRAG'N DROP
 */
 void PanelAppareils::dropEvent(QDropEvent */*e*/) {
 }
 
 /**
-Manage the start of drag'n drop
-@param supportedActions Supported actions
-@todo transfer the lines like "if (" such device ") build TelAppareil" => find a way to automate this
+	GERE THE BEGINNING OF DRAG'N DROP
+	@param supported Actions Les actions supporters
+	@todo turn the �if type lines ("such device") Build TelApplay => Find a way to automate CA
  */
 void PanelAppareils::startDrag(Qt::DropActions /*supportedActions*/) {
-	// objet QDrag pour realiser le drag'n drop
-	//qDebug() << "foobar";
-
+	// QDAG object to achieve Drag'n Drop
 	QDrag *drag = new QDrag(this);
 	
-	// donnees qui seront transmises par le drag'n drop
+	// data that will be transmitted by Drag'n Drop
 	QMimeData *mimeData = new QMimeData();
 	
-	// appareil temporaire pour fournir un apercu
+	// temporary device to provide an overview
 	Element *appar;
 	int etat;
 	QString nom_fichier = currentItem() -> data(42).toString();
@@ -101,13 +99,13 @@ void PanelAppareils::startDrag(Qt::DropActions /*supportedActions*/) {
 	mimeData -> setText(nom_fichier);
 	drag -> setMimeData(mimeData);
 	
-	// accrochage d'une pixmap representant l'appareil au pointeur
+	// attach a pixmap representing the device to the pointer
 	drag -> setPixmap(appar -> pixmap());
 	drag -> setHotSpot(appar -> hotspot());
 	
-	// realisation du drag'n drop
+	// Realization You Drag'n Drop
 	drag -> start(Qt::CopyAction);
 	
-	// suppression de l'appareil temporaire
+	// Deleting the temporary device
 	delete appar;
 }
